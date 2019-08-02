@@ -110,4 +110,4 @@ data/
 fts/
 
 # weight files
-*.h5
+*.pth

@@ -16,7 +16,7 @@ from sklearn.metrics import average_precision_score
 
 def get_query_embedding(query_img_file, 
                         device, 
-                        model_weights_path="./weights/triplet_model.pth",
+                        model_weights_path,
                         ):
     
     # Create transformss
@@ -133,7 +133,7 @@ def inference_on_set(img_fts_dir="./fts/",
         QUERY_IMAGES = [os.path.join(img_fts_dir, file) for file in os.listdir(img_fts_dir)]
 
         # Query fts
-        query_fts =  get_query_embedding(query_img_file, weights_path, device)
+        query_fts =  get_query_embedding(query_img_file, device, weights_path)
 
         # Create similarity list
         similarity = []

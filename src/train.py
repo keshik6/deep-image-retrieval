@@ -34,7 +34,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
         Training history and Validation history (loss and average precision)
     """
     tr_loss, tr_map = [], []
-    val_loss, valid_map = [], []
+    valid_loss, valid_map = [], []
     best_val_map = 0.0
     weights_path = os.path.join(save_dir, model_name)
     infer=False
@@ -139,14 +139,14 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                     if best_val_map < valid_map_:
                         best_val_map = valid_map_
                         print("Saving best weights...")
-                        torch.save(model.state_dict(), weights_path=weights_path)
+                        torch.save(model.state_dict(), weights_path)
                 
                 else:
                     num_samples = float(len(valid_loader.dataset))
                     valid_loss_ = running_loss.item()/num_samples
-                    tr_loss.append(valid_loss_)
+                    valid_loss.append(valid_loss_)
                     print('valid_loss: {:.4f}\t'.format(valid_loss_))
-                    torch.save(model.state_dict(), weights_path=weights_path)
+                    torch.save(model.state_dict(), weights_path)
 
                 
     return ([tr_loss, tr_map], [val_loss, valid_map])
