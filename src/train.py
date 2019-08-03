@@ -11,11 +11,11 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from inference import inference_on_set
-
+from create_db import create_embeddings_db
 
 def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                 save_dir="./weights/", model_name="triplet.pth", 
-                epochs=20, log_file=None):
+                epochs=20, log_file=None, db=["./data/oxbuild/images/", "./fts"]):
     """
     Train a deep neural network model
     
@@ -37,6 +37,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     valid_loss, valid_map = [], []
     best_val_map = 0.0
     weights_path = os.path.join(save_dir, model_name)
+    temp_weights_path = os.path.join(save_dir, "temp-{}".format(model_name))
     infer=False
     
     # Each epoch has a training and validation phase
@@ -45,24 +46,24 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
         print("-------Epoch {}----------".format(epoch+1))
         log_file.write("-------Epoch {}----------".format(epoch+1))
 
-        criterion = TripletLoss()
+        criterion = TripletLoss(margin=3)
 
         if (epoch+1)%20 == 0:
             train_loader.dataset.increase_difficulty()
             valid_loader.dataset.increase_difficulty()
-            #criterion.reduce_margin()
+            criterion.reduce_margin()
         
         if epoch != 0:
-            infer = True
+            print("> Modifying learning rate")
             scheduler.step()
             
-
         for phase in ['train', 'valid']:
             running_loss = 0.0
             
             if phase == 'train':
                 model.train(True)  # Set model to training mode
                 
+                print("> Training the network")
                 for anchor, positive, negative in tqdm(train_loader):
                     anchor, positive, negative = anchor.to(device), positive.to(device), negative.to(device)
                     
@@ -89,25 +90,29 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                     gc.collect()
                     torch.cuda.empty_cache()
 
-                if infer:    
-                    num_samples = float(len(train_loader.dataset))
-                    tr_loss_ = running_loss.item()/num_samples
-                    print("> Calculating mAP on training set")
-                    tr_map_ = inference_on_set(subset="train", weights_path=weights_path, top_k=50, device=device)
-                    tr_loss.append(tr_loss_), tr_map.append(tr_map_)
-                    print('train_loss: {:.4f}\ttrain_mAP: {:.4f}'.format(tr_loss_, tr_map_))
-                    log_file.write('train_loss: {:.4f}\ttrain_mAP: {:.4f}\n'.format(tr_loss_, tr_map_))
+
+                # Save trained model
+                print("> Saving trained weights...")
+                torch.save(model.state_dict(), temp_weights_path)
+                    
+                # Using the trained weight files create the embeddings for the dataset
+                print("> Creating embeddings using learnt weights...")
+                create_embeddings_db(model_weights_path=temp_weights_path, device=device, image_dir=db[0], fts_dir=db[1])
+
+                # Calculate statistics and log
+                num_samples = float(len(train_loader.dataset))
+                tr_loss_ = running_loss.item()/num_samples
+                print("> Calculating mAP on training set")
+                tr_map_ = inference_on_set(subset="train", weights_path=temp_weights_path, top_k=50, device=device)
+                tr_loss.append(tr_loss_), tr_map.append(tr_map_)
+                print('> train_loss: {:.4f}\ttrain_mAP: {:.4f}'.format(tr_loss_, tr_map_))
+                log_file.write('> train_loss: {:.4f}\ttrain_mAP: {:.4f}\n'.format(tr_loss_, tr_map_))
                 
-                else:
-                    num_samples = float(len(train_loader.dataset))
-                    tr_loss_ = running_loss.item()/num_samples
-                    tr_loss.append(tr_loss_)
-                    print('train_loss: {:.4f}'.format(tr_loss_))
-                    log_file.write('train_loss: {:.4f}\n'.format(tr_loss_))
             
             else:
                 model.train(False)
 
+                print("> Running validation on the network")
                 with torch.no_grad():
                     for anchor, positive, negative in tqdm(valid_loader):
                         anchor, positive, negative = anchor.to(device), positive.to(device), negative.to(device)
@@ -133,27 +138,20 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                         gc.collect()
                         torch.cuda.empty_cache()
 
-                if infer:    
-                    num_samples = float(len(valid_loader.dataset))
-                    valid_loss_ = running_loss.item()/num_samples
-                    print("> Calculating mAP on validation set")
-                    valid_map_ = inference_on_set(subset="valid", weights_path=weights_path, top_k=50, device=device)
-                    valid_loss.append(valid_loss_), valid_map.append(valid_map_)
-                    print('valid_loss: {:.4f}\tvalid_mAP: {:.4f}'.format(valid_loss_, valid_map_))
-                    log_file.write('valid_loss: {:.4f}\tvalid_mAP: {:.4f}\n'.format(valid_loss_, valid_map_))
-
-                    if best_val_map < valid_map_:
-                        best_val_map = valid_map_
-                        print("Saving best weights...")
-                        log_file.write("Saving best weights...\n")
-                        torch.save(model.state_dict(), weights_path)
+                # Get statistics and log
+                num_samples = float(len(valid_loader.dataset))
+                valid_loss_ = running_loss.item()/num_samples
+                print("> Calculating mAP on validation set")
+                valid_map_ = inference_on_set(subset="valid", weights_path=temp_weights_path, top_k=50, device=device)
+                valid_loss.append(valid_loss_), valid_map.append(valid_map_)
+                print('> valid_loss: {:.4f}\tvalid_mAP: {:.4f}'.format(valid_loss_, valid_map_))
+                log_file.write('> valid_loss: {:.4f}\tvalid_mAP: {:.4f}\n'.format(valid_loss_, valid_map_))
                 
-                else:
-                    num_samples = float(len(valid_loader.dataset))
-                    valid_loss_ = running_loss.item()/num_samples
-                    valid_loss.append(valid_loss_)
-                    print('valid_loss: {:.4f}\t'.format(valid_loss_))
-                    log_file.write('valid_loss: {:.4f}\t'.format(valid_loss_))
+                # If improvement in mAP is observed, best weights = temporary weights
+                if best_val_map < valid_map_:
+                    best_val_map = valid_map_
+                    print("> Saving best weights...")
+                    log_file.write("Saving best weights...\n")
                     torch.save(model.state_dict(), weights_path)
 
                 

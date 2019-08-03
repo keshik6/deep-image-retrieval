@@ -92,7 +92,7 @@ class OxfordDataset(Dataset):
         self.transforms = transforms
         self.query_pairs, self.pair_weights = dict(), dict()
         self.duplicated_query_names = query_names*10
-        self.bad_thres, self.junk_thres, self.ok_thres = 2.0, 0.5, 1.0
+        self.bad_thres, self.junk_thres, self.ok_thres = 2.0, 0.5, 0.1
         self.junk_idx, self.ok_idx = [], []
         self._generate_pairs_and_weights()
     

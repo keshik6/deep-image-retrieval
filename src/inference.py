@@ -12,7 +12,7 @@ import torchvision.models as models
 import torch
 from utils import draw_label, ap_at_k_per_query, get_preds, get_preds_and_visualize
 from sklearn.metrics import average_precision_score
-
+from create_db import create_embeddings_db
 
 def get_query_embedding(query_img_file, 
                         device, 
@@ -115,6 +115,7 @@ def inference_on_set(img_fts_dir="./fts/",
                 weights_path="./weights/",
                 device=None,
                 ):
+    
     
     # Create Query extractor object
     QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset=subset)

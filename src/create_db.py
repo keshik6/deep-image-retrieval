@@ -11,20 +11,14 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 
 
-def create_embeddings_db(model_weights_path="./weights/triplet_model.pth", image_dir="./data/oxbuild/images/", fts_dir="./fts/"):
-    
-    # Create cuda parameters
-    use_cuda = torch.cuda.is_available()
-    np.random.seed(2019)
-    torch.manual_seed(2019)
-    device = torch.device("cuda" if use_cuda else "cpu")
-    print("Available device = ", device)
 
+def create_embeddings_db(model_weights_path, device, image_dir="./data/oxbuild/images/", fts_dir="./fts/"):
+    
     # Create transformss
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    transforms_test = transforms.Compose([transforms.Resize(280),
-                                        transforms.FiveCrop(256),                                 
+    transforms_test = transforms.Compose([transforms.Resize(560),
+                                        transforms.FiveCrop(548),                                 
                                         transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
                                         ])
 
@@ -56,4 +50,4 @@ def create_embeddings_db(model_weights_path="./weights/triplet_model.pth", image
         
 
 
-create_embeddings_db()
+# create_embeddings_db()

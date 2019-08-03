@@ -29,8 +29,8 @@ def main(exp_num=1):
     # Create transformss
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    transforms_train = transforms.Compose([transforms.Resize(280),
-                                        transforms.RandomResizedCrop(256),                                 
+    transforms_train = transforms.Compose([transforms.Resize(460),
+                                        transforms.RandomResizedCrop(448),                                 
                                         transforms.ColorJitter(brightness=(0.80, 1.20)),
                                         transforms.RandomHorizontalFlip(p = 0.50),
                                         transforms.RandomRotation(15),
@@ -38,8 +38,8 @@ def main(exp_num=1):
                                         transforms.Normalize(mean=mean, std=std),
                                         ])
 
-    transforms_valid = transforms.Compose([transforms.Resize(280),
-                                            transforms.FiveCrop(256),                                 
+    transforms_valid = transforms.Compose([transforms.Resize(460),
+                                            transforms.FiveCrop(448),                                 
                                             transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
                                             ])
 
@@ -75,7 +75,7 @@ def main(exp_num=1):
     # Train
     tr_hist, val_hist = train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                     save_dir="./weights/", model_name="triplet_model.pth", 
-                    epochs=3, log_file=log_file)
+                    epochs=60, log_file=log_file)
 
     # Close the file
     log_file.close()
