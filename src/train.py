@@ -43,6 +43,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     for epoch in range(epochs):
         
         print("-------Epoch {}----------".format(epoch+1))
+        log_file.write("-------Epoch {}----------".format(epoch+1))
 
         criterion = TripletLoss()
 
@@ -91,15 +92,18 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                 if infer:    
                     num_samples = float(len(train_loader.dataset))
                     tr_loss_ = running_loss.item()/num_samples
+                    print("> Calculating mAP on training set")
                     tr_map_ = inference_on_set(subset="train", weights_path=weights_path, top_k=50, device=device)
                     tr_loss.append(tr_loss_), tr_map.append(tr_map_)
                     print('train_loss: {:.4f}\ttrain_mAP: {:.4f}'.format(tr_loss_, tr_map_))
+                    log_file.write('train_loss: {:.4f}\ttrain_mAP: {:.4f}\n'.format(tr_loss_, tr_map_))
                 
                 else:
                     num_samples = float(len(train_loader.dataset))
                     tr_loss_ = running_loss.item()/num_samples
                     tr_loss.append(tr_loss_)
                     print('train_loss: {:.4f}'.format(tr_loss_))
+                    log_file.write('train_loss: {:.4f}\n'.format(tr_loss_))
             
             else:
                 model.train(False)
@@ -132,13 +136,16 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                 if infer:    
                     num_samples = float(len(valid_loader.dataset))
                     valid_loss_ = running_loss.item()/num_samples
+                    print("> Calculating mAP on validation set")
                     valid_map_ = inference_on_set(subset="valid", weights_path=weights_path, top_k=50, device=device)
                     valid_loss.append(valid_loss_), valid_map.append(valid_map_)
                     print('valid_loss: {:.4f}\tvalid_mAP: {:.4f}'.format(valid_loss_, valid_map_))
+                    log_file.write('valid_loss: {:.4f}\tvalid_mAP: {:.4f}\n'.format(valid_loss_, valid_map_))
 
                     if best_val_map < valid_map_:
                         best_val_map = valid_map_
                         print("Saving best weights...")
+                        log_file.write("Saving best weights...\n")
                         torch.save(model.state_dict(), weights_path)
                 
                 else:
@@ -146,68 +153,9 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                     valid_loss_ = running_loss.item()/num_samples
                     valid_loss.append(valid_loss_)
                     print('valid_loss: {:.4f}\t'.format(valid_loss_))
+                    log_file.write('valid_loss: {:.4f}\t'.format(valid_loss_))
                     torch.save(model.state_dict(), weights_path)
 
                 
-    return ([tr_loss, tr_map], [val_loss, valid_map])
+    return ([tr_loss, tr_map], [valid_loss, valid_map])
     
-
-
-# Define directories
-labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
-
-# Create Query extractor object
-q_train = QueryExtractor(labels_dir, image_dir, subset="train")
-q_valid = QueryExtractor(labels_dir, image_dir, subset="valid")
-
-# Get query list and query map
-query_names_train, query_map_train = q_train.get_query_names(), q_train.get_query_map()
-query_names_valid, query_map_valid = q_valid.get_query_names(), q_valid.get_query_map()
-
-# Create transformss
-mean = [0.485, 0.456, 0.406]
-std = [0.229, 0.224, 0.225]
-transforms_train = transforms.Compose([transforms.Resize(280),
-                                      transforms.RandomResizedCrop(256),                                 
-                                      transforms.ColorJitter(brightness=(0.80, 1.20)),
-                                      transforms.RandomHorizontalFlip(p = 0.50),
-                                      transforms.RandomRotation(15),
-                                      transforms.ToTensor(), 
-                                      transforms.Normalize(mean=mean, std=std),
-                                      ])
-
-transforms_valid = transforms.Compose([transforms.Resize(280),
-                                        transforms.FiveCrop(256),                                 
-                                        transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
-                                        ])
-
-# Create dataset
-oxford_train = OxfordDataset(labels_dir, image_dir, query_names_train, query_map_train, transforms=transforms_train)
-oxford_valid = OxfordDataset(labels_dir, image_dir, query_names_valid, query_map_valid, transforms=transforms_valid)
-
-# Create dataloader
-train_loader = DataLoader(oxford_train, batch_size=4, num_workers=0, shuffle=True)
-valid_loader = DataLoader(oxford_valid, batch_size=4, num_workers=0, shuffle=False)
-
-# Create cuda parameters
-use_cuda = torch.cuda.is_available()
-np.random.seed(2019)
-torch.manual_seed(2019)
-device = torch.device("cuda" if use_cuda else "cpu")
-print("Available device = ", device)
-
-# Create embedding network
-resnet_model = models.resnet101(pretrained=True)
-#resnet_model.fc = Identity()
-model = TripletNet(resnet_model)
-model.to(device)
-
-# Create optimizer and scheduler
-optimizer = optim.Adam(model.parameters(), lr=7.5e-5)
-scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
-
-# Train
-train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
-                save_dir="./weights/", model_name="triplet_model.pth", 
-                epochs=50, log_file=None)
-
