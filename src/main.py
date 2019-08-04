@@ -47,8 +47,8 @@ def main(exp_num=1):
     oxford_valid = OxfordDataset(labels_dir, image_dir, triplets_valid, transforms=transforms_valid)
 
     # Create dataloader
-    train_loader = DataLoader(oxford_train, batch_size=4, num_workers=0, shuffle=True)
-    valid_loader = DataLoader(oxford_valid, batch_size=4, num_workers=0, shuffle=False)
+    train_loader = DataLoader(oxford_train, batch_size=4, num_workers=4, shuffle=True)
+    valid_loader = DataLoader(oxford_valid, batch_size=4, num_workers=4, shuffle=False)
 
     # Create cuda parameters
     use_cuda = torch.cuda.is_available()
@@ -64,7 +64,7 @@ def main(exp_num=1):
     model.to(device)
 
     # Create optimizer and scheduler
-    optimizer = optim.Adam(model.parameters(), lr=7.5e-5)
+    optimizer = optim.Adam(model.parameters(), lr=1e-4)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
 
     # Create log file
@@ -79,5 +79,5 @@ def main(exp_num=1):
     # Close the file
     log_file.close()
 
-
-main()
+if __name__ == '__main__':
+    main()

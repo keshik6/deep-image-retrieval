@@ -37,6 +37,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     best_val_map = 0.0
     weights_path = os.path.join(save_dir, model_name)
     temp_weights_path = os.path.join(save_dir, "temp-{}".format(model_name))
+    valid_map_ = 0
     infer=False
     
     # Each epoch has a training and validation phase
@@ -45,14 +46,9 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
         print("-------Epoch {}----------".format(epoch+1))
         log_file.write("-------Epoch {}----------".format(epoch+1))
 
-        criterion = TripletLoss(margin=3)
-
-        if (epoch+1)%20 == 0:
-            train_loader.dataset.increase_difficulty()
-            valid_loader.dataset.increase_difficulty()
-            criterion.reduce_margin()
+        criterion = TripletLoss(margin=2)
         
-        if epoch != 0:
+        if (epoch+1)%3 == 0:
             print("> Modifying learning rate")
             scheduler.step()
             

@@ -159,9 +159,9 @@ class OxfordDataset(Dataset):
         negative_img = Image.open(negative_path).convert('RGB')
 
         # Get mean and std for every image
-        anchor_mean, anchor_std = np.mean(np.asarray(anchor_img)/255, axis=(0, 1)), np.std(np.asarray(anchor_img)/255, axis=(0, 1))
-        positive_mean, positive_std = np.mean(np.asarray(positive_img)/255, axis=(0, 1)), np.std(np.asarray(positive_img)/255, axis=(0, 1))
-        negative_mean, negative_std = np.mean(np.asarray(negative_img)/255, axis=(0, 1)), np.std(np.asarray(negative_img)/255, axis=(0, 1))
+        anchor_mean, anchor_std = np.mean(np.asarray(anchor_img)/255.0, axis=(0, 1)), np.std(np.asarray(anchor_img)/255.0, axis=(0, 1))
+        positive_mean, positive_std = np.mean(np.asarray(positive_img)/255.0, axis=(0, 1)), np.std(np.asarray(positive_img)/255.0, axis=(0, 1))
+        negative_mean, negative_std = np.mean(np.asarray(negative_img)/255.0, axis=(0, 1)), np.std(np.asarray(negative_img)/255.0, axis=(0, 1))
         
         # Transform the images
         if self.transforms is not None:
@@ -198,7 +198,8 @@ class EmbeddingDataset(Dataset):
     def __getitem__(self, index):
         image_path = self.filenames[index]
         image = Image.open(image_path).convert('RGB')
-        image = self.transforms(image)
+        mean, std = np.mean(np.asarray(image)/255.0, axis=(0, 1)), np.std(np.asarray(image)/255, axis=(0, 1))
+        image = transforms.functional.normalize(self.transforms(image), mean=mean, std=std, inplace=False)
         return image
         
 

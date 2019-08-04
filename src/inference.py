@@ -19,14 +19,18 @@ def get_query_embedding(model,
                         query_img_file,  
                         ):
     
+    # Read image
+    image = Image.open(query_img_file)
+    mean, std = np.mean(np.asarray(image)/255.0, axis=(0, 1)), np.std(np.asarray(image)/255.0, axis=(0, 1))
+
     # Create transformss
     transforms_test = transforms.Compose([transforms.Resize(280),
                                         transforms.FiveCrop(256),                                 
                                         transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
+                                        transforms.Lambda(lambda crops: torch.stack([transforms.Normalize(mean = mean, std = std)(crop) for crop in crops])),
                                         ])
 
-    # Read image
-    image = Image.open(query_img_file)
+   
     image = transforms_test(image)
 
     # Predict
@@ -67,7 +71,7 @@ def inference_on_set(model,
                                         ])
 
     eval_dataset = EmbeddingDataset(image_dir=img_dir, query_img_list = QUERY_IMAGES, transforms=eval_transforms)
-    eval_loader = DataLoader(eval_dataset, batch_size=8, shuffle=False)
+    eval_loader = DataLoader(eval_dataset, batch_size=12, num_workers=4, shuffle=False)
 
     with torch.no_grad():
         for idx, images in enumerate(tqdm(eval_loader)):
@@ -135,13 +139,13 @@ def inference_on_set(model,
         best_matches = [QUERY_IMAGES[index] for index in indexes]
         
         # Get preds
-        preds = get_preds(best_matches, query_gt_dict, img_dir)
+        preds = get_preds(best_matches, query_gt_dict)
         
         # Get average precision
         ap = ap_at_k_per_query(preds, top_k)
         ap_list_valid.append(ap)
 
-
+    print(ap_list_train, ap_list_valid)
     return np.array(ap_list_train).mean(), np.array(ap_list_valid).mean()
     
 
