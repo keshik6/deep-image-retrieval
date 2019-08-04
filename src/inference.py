@@ -72,7 +72,7 @@ def inference_on_set(model,
     with torch.no_grad():
         for idx, images in enumerate(tqdm(eval_loader)):
             images = images.to(device)
-            output = model.get_embedding(images).detach()
+            output = model.get_embedding(images)
 
             if idx == 0:
                 QUERY_FTS_DB = output
@@ -107,7 +107,7 @@ def inference_on_set(model,
         best_matches = [QUERY_IMAGES[index] for index in indexes]
         
         # Get preds
-        preds = get_preds(best_matches, query_gt_dict, img_dir)
+        preds = get_preds(best_matches, query_gt_dict)
         
         # Get average precision
         ap = ap_at_k_per_query(preds, top_k)
