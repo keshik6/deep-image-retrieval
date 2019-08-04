@@ -11,7 +11,6 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from inference import inference_on_set
-from create_db import create_embeddings_db
 
 def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                 save_dir="./weights/", model_name="triplet.pth", 
@@ -94,16 +93,12 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                 # Save trained model
                 print("> Saving trained weights...")
                 torch.save(model.state_dict(), temp_weights_path)
-                    
-                # Using the trained weight files create the embeddings for the dataset
-                print("> Creating embeddings using learnt weights...")
-                create_embeddings_db(model_weights_path=temp_weights_path, device=device, image_dir=db[0], fts_dir=db[1])
+                
 
                 # Calculate statistics and log
                 num_samples = float(len(train_loader.dataset))
                 tr_loss_ = running_loss.item()/num_samples
-                print("> Calculating mAP on training set")
-                tr_map_ = inference_on_set(subset="train", weights_path=temp_weights_path, top_k=50, device=device)
+                tr_map_, valid_map_ = inference_on_set(model=model, top_k=50, device=device)
                 tr_loss.append(tr_loss_), tr_map.append(tr_map_)
                 print('> train_loss: {:.4f}\ttrain_mAP: {:.4f}'.format(tr_loss_, tr_map_))
                 log_file.write('> train_loss: {:.4f}\ttrain_mAP: {:.4f}\n'.format(tr_loss_, tr_map_))
@@ -117,16 +112,9 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                     for anchor, positive, negative in tqdm(valid_loader):
                         anchor, positive, negative = anchor.to(device), positive.to(device), negative.to(device)
                         
-                        # Create five cropped embeddings
-                        bs, ncrops, c, h, w = anchor.size()
-
                         # Retrieve the embeddings
-                        output1, output2, output3 = model(anchor.view(-1, c, h, w), positive.view(-1, c, h, w), negative.view(-1, c, h, w))
-
-                        output1 = output1.view(bs, ncrops, -1).mean(1)
-                        output2 = output2.view(bs, ncrops, -1).mean(1)
-                        output3 = output3.view(bs, ncrops, -1).mean(1)
-
+                        output1, output2, output3 = model(anchor, positive, negative)
+                        
                         # Calculate the triplet loss
                         loss = criterion(output1, output2, output3)
                         
@@ -141,8 +129,6 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                 # Get statistics and log
                 num_samples = float(len(valid_loader.dataset))
                 valid_loss_ = running_loss.item()/num_samples
-                print("> Calculating mAP on validation set")
-                valid_map_ = inference_on_set(subset="valid", weights_path=temp_weights_path, top_k=50, device=device)
                 valid_loss.append(valid_loss_), valid_map.append(valid_map_)
                 print('> valid_loss: {:.4f}\tvalid_mAP: {:.4f}'.format(valid_loss_, valid_map_))
                 log_file.write('> valid_loss: {:.4f}\tvalid_mAP: {:.4f}\n'.format(valid_loss_, valid_map_))
@@ -157,3 +143,5 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                 
     return ([tr_loss, tr_map], [valid_loss, valid_map])
     
+
+

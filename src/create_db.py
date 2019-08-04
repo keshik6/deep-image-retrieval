@@ -17,8 +17,8 @@ def create_embeddings_db(model_weights_path, device, image_dir="./data/oxbuild/i
     # Create transformss
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    transforms_test = transforms.Compose([transforms.Resize(560),
-                                        transforms.FiveCrop(548),                                 
+    transforms_test = transforms.Compose([transforms.Resize(460),
+                                        transforms.FiveCrop(448),                                 
                                         transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
                                         ])
 
@@ -49,5 +49,11 @@ def create_embeddings_db(model_weights_path, device, image_dir="./data/oxbuild/i
             np.save(save_path, output)
         
 
+# # Create cuda parameters
+# use_cuda = torch.cuda.is_available()
+# np.random.seed(2019)
+# torch.manual_seed(2019)
+# device = torch.device("cuda" if use_cuda else "cpu")
+# print("Available device = ", device)
 
-# create_embeddings_db()
+# create_embeddings_db("./weights/temp-triplet_model.pth", device)

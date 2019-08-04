@@ -6,22 +6,20 @@ import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
 from model import TripletLoss, TripletNet, Identity
-from dataset import QueryExtractor, EvalDataset
+from dataset import QueryExtractor, EmbeddingDataset
 from torchvision import transforms
 import torchvision.models as models
 import torch
 from utils import draw_label, ap_at_k_per_query, get_preds, get_preds_and_visualize
 from sklearn.metrics import average_precision_score
-from create_db import create_embeddings_db
+from torch.utils.data import DataLoader
 
-def get_query_embedding(query_img_file, 
-                        device, 
-                        model_weights_path,
+def get_query_embedding(model, 
+                        device,
+                        query_img_file,  
                         ):
     
     # Create transformss
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
     transforms_test = transforms.Compose([transforms.Resize(280),
                                         transforms.FiveCrop(256),                                 
                                         transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
@@ -31,13 +29,6 @@ def get_query_embedding(query_img_file,
     image = Image.open(query_img_file)
     image = transforms_test(image)
 
-    # Create embedding network
-    resnet_model = models.resnet101(pretrained=False)
-    model = TripletNet(resnet_model)
-    model.load_state_dict(torch.load(model_weights_path))
-    model.to(device)
-    model.eval()
-
     # Predict
     with torch.no_grad():
         # Move image to device and get crops
@@ -46,105 +37,72 @@ def get_query_embedding(query_img_file,
 
         # Get output
         output = model.get_embedding(image.view(-1, c, h, w))
-        output = output.view(ncrops, -1).mean(0).cpu().numpy()
+        output = output.view(ncrops, -1).mean(0)
 
         return output
 
 
-def inference_on_single_labelled_image(query_img_file, 
-                img_fts_dir="./fts/", 
+def inference_on_set(model,
                 labels_dir="./data/oxbuild/gt_files/", 
                 img_dir="./data/oxbuild/images/",
-                top_k=100,
-                plot=True,
-                ):
-    
-    # Create cuda parameters
-    use_cuda = torch.cuda.is_available()
-    np.random.seed(2019)
-    torch.manual_seed(2019)
-    device = torch.device("cuda" if use_cuda else "cpu")
-    print("Available device = ", device)
-
-    # Get query name
-    query_img_name = query_img_file.split("/")[-1]
-
-    # Create Query extractor object
-    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset="valid")
-    if query_img_name not in QUERY_EXTRACTOR.get_query_names():
-        QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset="train")
-    
-    # Create query ground truth dictionary
-    query_gt_dict = QUERY_EXTRACTOR.get_query_map()[query_img_name]
-
-    # Creat image database
-    QUERY_IMAGES = [os.path.join(img_fts_dir, file) for file in os.listdir(img_fts_dir)]
-
-    # Query fts
-    query_fts =  get_query_embedding(query_img_file, device)
-
-    # Create similarity list
-    similarity = []
-    for file in QUERY_IMAGES:
-        file_fts = np.squeeze(np.load(file))
-        cos_sim = np.dot(query_fts, file_fts)/(np.linalg.norm(query_fts)*np.linalg.norm(file_fts))
-        similarity.append(cos_sim)
-
-    # Get best matches using similarity
-    similarity = np.asarray(similarity)
-    indexes = (-similarity).argsort()[:top_k]
-    best_matches = [QUERY_IMAGES[index] for index in indexes]
-    
-    # Get preds
-    if plot:
-        preds = get_preds_and_visualize(best_matches, query_gt_dict, img_dir, 20)
-    else:
-        preds = get_preds(best_matches, query_gt_dict, img_dir)
-    
-    # Get average precision
-    ap = ap_at_k_per_query(preds, top_k)
-
-    return ap
-
-
-def inference_on_set(img_fts_dir="./fts/", 
-                labels_dir="./data/oxbuild/gt_files/", 
-                img_dir="./data/oxbuild/images/",
-                top_k=25,
-                subset="train",
-                weights_path="./weights/",
+                top_k=50,
                 device=None,
                 ):
     
-    
+    model.eval()
+
     # Create Query extractor object
-    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset=subset)
+    QUERY_EXTRACTOR_TRAIN = QueryExtractor(labels_dir, img_dir, subset="train")
+    QUERY_EXTRACTOR_VALID = QueryExtractor(labels_dir, img_dir, subset="valid")
+
+    # Creat image database
+    QUERY_IMAGES = [os.path.join(img_dir, file) for file in sorted(os.listdir(img_dir))]
+
+    # Create QUERY FTS numpy matrix
+    print("> Creating feature embeddings")
+    QUERY_FTS_DB = None
+    eval_transforms = transforms.Compose([transforms.Resize(280),
+                                        transforms.CenterCrop(256),
+                                        transforms.ToTensor(),
+                                        ])
+
+    eval_dataset = EmbeddingDataset(image_dir=img_dir, query_img_list = QUERY_IMAGES, transforms=eval_transforms)
+    eval_loader = DataLoader(eval_dataset, batch_size=8, shuffle=False)
+
+    with torch.no_grad():
+        for idx, images in enumerate(tqdm(eval_loader)):
+            images = images.to(device)
+            output = model.get_embedding(images).detach()
+
+            if idx == 0:
+                QUERY_FTS_DB = output
+            else:
+                QUERY_FTS_DB = torch.cat((QUERY_FTS_DB, output), 0)
+
+            del images, output
+            gc.collect()
+            torch.cuda.empty_cache()
 
     # Create ap list
-    ap_list = []
+    ap_list_train, ap_list_valid = [], []
 
-    for query_img_name in tqdm(QUERY_EXTRACTOR.get_query_names()):
+    # Evaluate on training set
+    print("> Calculating mAP on training set")
+    for query_img_name in tqdm(QUERY_EXTRACTOR_TRAIN.get_query_names()):
         # Create query ground truth dictionary
-        query_gt_dict = QUERY_EXTRACTOR.get_query_map()[query_img_name]
+        query_gt_dict = QUERY_EXTRACTOR_TRAIN.get_query_map()[query_img_name]
 
         # Create query image file path
         query_img_file = os.path.join(img_dir, query_img_name)
         
-        # Creat image database
-        QUERY_IMAGES = [os.path.join(img_fts_dir, file) for file in os.listdir(img_fts_dir)]
-
         # Query fts
-        query_fts =  get_query_embedding(query_img_file, device, weights_path)
+        query_fts =  get_query_embedding(model, device, query_img_file)
 
         # Create similarity list
-        similarity = []
-        for file in QUERY_IMAGES:
-            file_fts = np.squeeze(np.load(file))
-            cos_sim = np.dot(query_fts, file_fts)/(np.linalg.norm(query_fts)*np.linalg.norm(file_fts))
-            similarity.append(cos_sim)
+        similarity = torch.matmul(query_fts, QUERY_FTS_DB.t())
 
         # Get best matches using similarity
-        similarity = np.asarray(similarity)
+        similarity = similarity.cpu().numpy()
         indexes = (-similarity).argsort()[:top_k]
         best_matches = [QUERY_IMAGES[index] for index in indexes]
         
@@ -153,12 +111,41 @@ def inference_on_set(img_fts_dir="./fts/",
         
         # Get average precision
         ap = ap_at_k_per_query(preds, top_k)
-        ap_list.append(ap)
-
-    return np.array(ap_list).mean()
+        ap_list_train.append(ap)
     
 
-# ap = inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000051.jpg")
+    # Evaluate on validation set
+    print("> Calculating mAP of validation set")
+    for query_img_name in tqdm(QUERY_EXTRACTOR_VALID.get_query_names()):
+        # Create query ground truth dictionary
+        query_gt_dict = QUERY_EXTRACTOR_VALID.get_query_map()[query_img_name]
+
+        # Create query image file path
+        query_img_file = os.path.join(img_dir, query_img_name)
+        
+        # Query fts
+        query_fts =  get_query_embedding(model, device, query_img_file)
+
+        # Create similarity list
+        similarity = torch.matmul(query_fts, QUERY_FTS_DB.t())
+
+        # Get best matches using similarity
+        similarity = similarity.cpu().numpy()
+        indexes = (-similarity).argsort()[:top_k]
+        best_matches = [QUERY_IMAGES[index] for index in indexes]
+        
+        # Get preds
+        preds = get_preds(best_matches, query_gt_dict, img_dir)
+        
+        # Get average precision
+        ap = ap_at_k_per_query(preds, top_k)
+        ap_list_valid.append(ap)
+
+
+    return np.array(ap_list_train).mean(), np.array(ap_list_valid).mean()
+    
+
+# ap = inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", top_k=50)
 # print(ap)
 
 

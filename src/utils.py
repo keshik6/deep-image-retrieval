@@ -38,14 +38,11 @@ def get_preds_and_visualize(best_matches, query_gt_dict, img_dir, top_k_to_plot)
     for i, pic in enumerate(best_matches): 
         img_name = "{}.jpg".format(pic.split("/")[2].split(".")[0])
         color_code = None
-        if img_name in query_gt_dict['good']:
+        if img_name in query_gt_dict['positive']:
             color_code = (0, 255, 0)
             preds.append(1)
-        elif img_name in query_gt_dict['ok']:
+        elif img_name in query_gt_dict['negative']:
             color_code = (255, 255, 0)
-            preds.append(1)
-        elif img_name in query_gt_dict['junk']:
-            color_code = (0, 255, 255)
             preds.append(1)
         else:
             color_code = (255, 0, 0)
@@ -65,20 +62,17 @@ def get_preds_and_visualize(best_matches, query_gt_dict, img_dir, top_k_to_plot)
 
 
 
-def get_preds(best_matches, query_gt_dict, img_dir, plot=True):
+def get_preds(best_matches, query_gt_dict, plot=True):
    
     # Create python list to store preds
     preds = []
 
     # Iterate through the best matches and find predictions
     for i, pic in enumerate(best_matches): 
-        img_name = "{}.jpg".format(pic.split("/")[2].split(".")[0])
-        color_code = None
-        if img_name in query_gt_dict['good']:
+        img_name = "{}".format(pic.split("/")[-1])
+        if img_name in query_gt_dict['positive']:
             preds.append(1)
-        elif img_name in query_gt_dict['ok']:
-            preds.append(1)
-        elif img_name in query_gt_dict['junk']:
+        elif img_name in query_gt_dict['negative']:
             preds.append(1)
         else:
             preds.append(0)

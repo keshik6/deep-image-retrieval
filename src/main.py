@@ -3,7 +3,6 @@ import torch
 import gc
 import os
 import numpy as np
-from sklearn.metrics import cohen_kappa_score
 from model import TripletLoss, TripletNet, Identity
 from dataset import QueryExtractor, OxfordDataset
 from torchvision import transforms
@@ -23,29 +22,29 @@ def main(exp_num=1):
     q_valid = QueryExtractor(labels_dir, image_dir, subset="valid")
 
     # Get query list and query map
-    query_names_train, query_map_train = q_train.get_query_names(), q_train.get_query_map()
-    query_names_valid, query_map_valid = q_valid.get_query_names(), q_valid.get_query_map()
+    triplets_train, triplets_valid = q_train.get_triplets(), q_valid.get_triplets() 
+    print(len(triplets_train), len(triplets_valid))
 
     # Create transformss
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
-    transforms_train = transforms.Compose([transforms.Resize(460),
-                                        transforms.RandomResizedCrop(448),                                 
+    # mean = [0.485, 0.456, 0.406]
+    # std = [0.229, 0.224, 0.225]
+    transforms_train = transforms.Compose([transforms.Resize(280),
+                                        transforms.RandomResizedCrop(256),                                 
                                         transforms.ColorJitter(brightness=(0.80, 1.20)),
                                         transforms.RandomHorizontalFlip(p = 0.50),
                                         transforms.RandomRotation(15),
                                         transforms.ToTensor(), 
-                                        transforms.Normalize(mean=mean, std=std),
+                                        #transforms.Normalize(mean=mean, std=std),
                                         ])
 
-    transforms_valid = transforms.Compose([transforms.Resize(460),
-                                            transforms.FiveCrop(448),                                 
-                                            transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
+    transforms_valid = transforms.Compose([transforms.Resize(280),
+                                            transforms.CenterCrop(256),                                 
+                                            transforms.ToTensor(),
                                             ])
 
     # Create dataset
-    oxford_train = OxfordDataset(labels_dir, image_dir, query_names_train, query_map_train, transforms=transforms_train)
-    oxford_valid = OxfordDataset(labels_dir, image_dir, query_names_valid, query_map_valid, transforms=transforms_valid)
+    oxford_train = OxfordDataset(labels_dir, image_dir, triplets_train, transforms=transforms_train)
+    oxford_valid = OxfordDataset(labels_dir, image_dir, triplets_valid, transforms=transforms_valid)
 
     # Create dataloader
     train_loader = DataLoader(oxford_train, batch_size=4, num_workers=0, shuffle=True)
@@ -75,7 +74,7 @@ def main(exp_num=1):
     # Train
     tr_hist, val_hist = train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                     save_dir="./weights/", model_name="triplet_model.pth", 
-                    epochs=60, log_file=log_file)
+                    epochs=3, log_file=log_file)
 
     # Close the file
     log_file.close()
