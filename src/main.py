@@ -74,7 +74,7 @@ def main(exp_num=1):
     # Train
     tr_hist, val_hist = train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                     save_dir="./weights/", model_name="triplet_model.pth", 
-                    epochs=3, log_file=log_file)
+                    epochs=40, log_file=log_file)
 
     # Close the file
     log_file.close()
