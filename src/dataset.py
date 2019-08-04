@@ -110,6 +110,7 @@ class QueryExtractor():
         """
         This function generates (anchor, positive), (anchor, negative) pairs for all the queries
         """
+        self.triplet_pairs = []
         for anchor in self.query_names:
             anchor_positive_pairs = [(anchor, positive) for positive in self.query_map[anchor]['positive']]
             anchor_negative_pairs = [(anchor, negative) for negative in self.query_map[anchor]['negative']]
@@ -128,17 +129,29 @@ class QueryExtractor():
         
 
     def get_triplets(self):
+        shuffle(self.triplet_pairs)
+        return self.triplet_pairs
+
+    
+    def reset(self):
+        self._generate_triplets()
+        shuffle(self.triplet_pairs)
         return self.triplet_pairs
 
 
 class OxfordDataset(Dataset):
 
-    def __init__(self, labels_dir, image_dir, triplet_pairs, transforms=None):
+    def __init__(self, labels_dir, image_dir, triplet_pair_generator, transforms=None):
         self.labels_dir = labels_dir
         self.image_dir = image_dir
-        self.triplet_pairs = triplet_pairs
+        self.triplet_generator = triplet_pair_generator
+        self.triplet_pairs = triplet_pair_generator.reset()
         self.transforms = transforms
         
+
+    def reset(self):
+        self.triplet_pairs = self.triplet_generator.reset()
+
 
     def __getitem__(self, index):
         # Get query image name
@@ -157,22 +170,15 @@ class OxfordDataset(Dataset):
         anchor_img = Image.open(anchor_path).convert('RGB')
         positive_img = Image.open(positive_path).convert('RGB')
         negative_img = Image.open(negative_path).convert('RGB')
-
-        # Get mean and std for every image
-        anchor_mean, anchor_std = np.mean(np.asarray(anchor_img)/255.0, axis=(0, 1)), np.std(np.asarray(anchor_img)/255.0, axis=(0, 1))
-        positive_mean, positive_std = np.mean(np.asarray(positive_img)/255.0, axis=(0, 1)), np.std(np.asarray(positive_img)/255.0, axis=(0, 1))
-        negative_mean, negative_std = np.mean(np.asarray(negative_img)/255.0, axis=(0, 1)), np.std(np.asarray(negative_img)/255.0, axis=(0, 1))
         
         # Transform the images
         if self.transforms is not None:
-            anchor_img = transforms.functional.normalize(self.transforms(anchor_img), mean=anchor_mean, std=anchor_std, inplace=False)
-            positive_img = transforms.functional.normalize(self.transforms(positive_img), mean=positive_mean, std=positive_std, inplace=False)
-            neg_img = transforms.functional.normalize(self.transforms(negative_img), mean=negative_mean, std=negative_std, inplace=False)
+            anchor_img = self.transforms(anchor_img)
+            positive_img = self.transforms(positive_img)
+            neg_img = self.transforms(negative_img)
             return anchor_img, positive_img, neg_img
         
-        return self._normalize_np_array(anchor_img, anchor_mean, anchor_std),\
-            self._normalize_np_array(positive_img, positive_mean, positive_std),\
-            self._normalize_np_array(negative_img, negative_mean, negative_std)
+        return anchor_img, positive_img, negative_img
     
 
     def __len__(self):
@@ -198,8 +204,7 @@ class EmbeddingDataset(Dataset):
     def __getitem__(self, index):
         image_path = self.filenames[index]
         image = Image.open(image_path).convert('RGB')
-        mean, std = np.mean(np.asarray(image)/255.0, axis=(0, 1)), np.std(np.asarray(image)/255, axis=(0, 1))
-        image = transforms.functional.normalize(self.transforms(image), mean=mean, std=std, inplace=False)
+        image = self.transforms(image)
         return image
         
 

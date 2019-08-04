@@ -11,19 +11,19 @@ class TripletNet(nn.Module):
 
     def forward(self, anchor, positive, negative):
         # Get embedding for anchor and normalize
-        anchor_embedding = F.normalize(self.embedding_net(anchor), p=2)
+        anchor_embedding = F.normalize(self.embedding_net(anchor), p=2, dim=0)
 
         # Get embedding for positive and normalize
-        positive_embedding = F.normalize(self.embedding_net(positive), p=2)
+        positive_embedding = F.normalize(self.embedding_net(positive), p=2, dim=0)
 
         # Get embedding for negative and normalize
-        negative_embedding = F.normalize(self.embedding_net(negative), p=2)
+        negative_embedding = F.normalize(self.embedding_net(negative), p=2, dim=0)
         
         return anchor_embedding, positive_embedding, negative_embedding
 
 
     def get_embedding(self, x):
-        return F.normalize(self.embedding_net(x), p=2)
+        return F.normalize(self.embedding_net(x), p=2, dim=0)
 
 
 class TripletLoss(nn.Module):

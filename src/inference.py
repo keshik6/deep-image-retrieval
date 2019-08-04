@@ -21,13 +21,12 @@ def get_query_embedding(model,
     
     # Read image
     image = Image.open(query_img_file)
-    mean, std = np.mean(np.asarray(image)/255.0, axis=(0, 1)), np.std(np.asarray(image)/255.0, axis=(0, 1))
 
     # Create transformss
     transforms_test = transforms.Compose([transforms.Resize(280),
                                         transforms.FiveCrop(256),                                 
                                         transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
-                                        transforms.Lambda(lambda crops: torch.stack([transforms.Normalize(mean = mean, std = std)(crop) for crop in crops])),
+                                        #transforms.Lambda(lambda crops: torch.stack([transforms.Normalize(mean = mean, std = std)(crop) for crop in crops])),
                                         ])
 
    

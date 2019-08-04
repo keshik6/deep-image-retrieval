@@ -22,8 +22,8 @@ def main(exp_num=1):
     q_valid = QueryExtractor(labels_dir, image_dir, subset="valid")
 
     # Get query list and query map
-    triplets_train, triplets_valid = q_train.get_triplets(), q_valid.get_triplets() 
-    print(len(triplets_train), len(triplets_valid))
+    # triplets_train, triplets_valid = q_train.get_triplets(), q_valid.get_triplets() 
+    # print(len(triplets_train), len(triplets_valid))
 
     # Create transformss
     # mean = [0.485, 0.456, 0.406]
@@ -43,8 +43,8 @@ def main(exp_num=1):
                                             ])
 
     # Create dataset
-    oxford_train = OxfordDataset(labels_dir, image_dir, triplets_train, transforms=transforms_train)
-    oxford_valid = OxfordDataset(labels_dir, image_dir, triplets_valid, transforms=transforms_valid)
+    oxford_train = OxfordDataset(labels_dir, image_dir, q_train, transforms=transforms_train)
+    oxford_valid = OxfordDataset(labels_dir, image_dir, q_valid, transforms=transforms_valid)
 
     # Create dataloader
     train_loader = DataLoader(oxford_train, batch_size=4, num_workers=4, shuffle=True)

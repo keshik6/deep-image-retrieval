@@ -36,7 +36,7 @@ def get_preds_and_visualize(best_matches, query_gt_dict, img_dir, top_k_to_plot)
     rows = int(top_k_to_plot/columns)
 
     for i, pic in enumerate(best_matches): 
-        img_name = "{}.jpg".format(pic.split("/")[2].split(".")[0])
+        img_name = "{}".format(pic.split("/")[-1])
         color_code = None
         if img_name in query_gt_dict['positive']:
             color_code = (0, 255, 0)

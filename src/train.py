@@ -11,6 +11,7 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from inference import inference_on_set
+import math
 
 def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                 save_dir="./weights/", model_name="triplet.pth", 
@@ -38,6 +39,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     weights_path = os.path.join(save_dir, model_name)
     temp_weights_path = os.path.join(save_dir, "temp-{}".format(model_name))
     valid_map_ = 0
+    last_batch = math.ceil(len(train_loader.dataset)/4)
     infer=False
     
     # Each epoch has a training and validation phase
@@ -47,6 +49,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
         log_file.write("-------Epoch {}----------".format(epoch+1))
 
         criterion = TripletLoss(margin=2)
+        train_loader.dataset.reset()
         
         if (epoch+1)%3 == 0:
             print("> Modifying learning rate")
@@ -58,12 +61,12 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
             if phase == 'train':
                 model.train(True)  # Set model to training mode
                 
+                # zero the parameter gradients
+                optimizer.zero_grad()
+                
                 print("> Training the network")
-                for anchor, positive, negative in tqdm(train_loader):
+                for batch_idx, [anchor, positive, negative] in enumerate(tqdm(train_loader)):
                     anchor, positive, negative = anchor.to(device), positive.to(device), negative.to(device)
-                    
-                    # zero the parameter gradients
-                    optimizer.zero_grad()
                     
                     # Retrieve the embeddings
                     output1, output2, output3 = model(anchor, positive, negative)
@@ -76,10 +79,16 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                     
                     # Backpropagate the system the determine the gradients
                     loss.backward()
-                    
-                    # Update the paramteres of the model
-                    optimizer.step()
 
+
+                    if (batch_idx + 1)%10 == 0 or (batch_idx+1) == last_batch:
+                        # Update the paramteres of the model
+                        optimizer.step()
+
+                        # zero the parameter gradients
+                        optimizer.zero_grad()
+                    
+                    
                     # clear variables
                     del anchor, positive, negative, output1, output2, output3
                     gc.collect()
