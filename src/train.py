@@ -15,7 +15,7 @@ import math
 
 def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                 save_dir="./weights/", model_name="triplet.pth", 
-                epochs=20, log_file=None, db=["./data/oxbuild/images/", "./fts"]):
+                epochs=20, log_file=None, db=["./data/oxbuild/images/", "./fts"], update_batch=10):
     """
     Train a deep neural network model
     
@@ -39,7 +39,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     weights_path = os.path.join(save_dir, model_name)
     temp_weights_path = os.path.join(save_dir, "temp-{}".format(model_name))
     valid_map_ = 0
-    last_batch = math.ceil(len(train_loader.dataset)/4)
+    last_batch = math.ceil(len(train_loader.dataset)/update_batch)
     infer=False
     
     # Each epoch has a training and validation phase
@@ -81,7 +81,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                     loss.backward()
 
 
-                    if (batch_idx + 1)%10 == 0 or (batch_idx+1) == last_batch:
+                    if (batch_idx + 1)%update_batch == 0 or (batch_idx+1) == last_batch:
                         # Update the paramteres of the model
                         optimizer.step()
 

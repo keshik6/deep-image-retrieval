@@ -3,7 +3,7 @@ import torch
 import gc
 import os
 import numpy as np
-from model import TripletLoss, TripletNet, Identity
+from model import TripletLoss, TripletNet, Identity, create_embedding_net
 from dataset import QueryExtractor, OxfordDataset
 from torchvision import transforms
 import torchvision.models as models
@@ -26,20 +26,21 @@ def main(exp_num=1):
     # print(len(triplets_train), len(triplets_valid))
 
     # Create transformss
-    # mean = [0.485, 0.456, 0.406]
-    # std = [0.229, 0.224, 0.225]
+    mean = [0.485, 0.456, 0.406]
+    std = [0.229, 0.224, 0.225]
     transforms_train = transforms.Compose([transforms.Resize(280),
-                                        transforms.RandomResizedCrop(256),                                 
+                                        transforms.RandomResizedCrop(224),                                 
                                         transforms.ColorJitter(brightness=(0.80, 1.20)),
                                         transforms.RandomHorizontalFlip(p = 0.50),
                                         transforms.RandomRotation(15),
                                         transforms.ToTensor(), 
-                                        #transforms.Normalize(mean=mean, std=std),
+                                        transforms.Normalize(mean=mean, std=std),
                                         ])
 
     transforms_valid = transforms.Compose([transforms.Resize(280),
-                                            transforms.CenterCrop(256),                                 
+                                            transforms.CenterCrop(224),                                 
                                             transforms.ToTensor(),
+                                            transforms.Normalize(mean=mean, std=std),
                                             ])
 
     # Create dataset
@@ -47,8 +48,8 @@ def main(exp_num=1):
     oxford_valid = OxfordDataset(labels_dir, image_dir, q_valid, transforms=transforms_valid)
 
     # Create dataloader
-    train_loader = DataLoader(oxford_train, batch_size=4, num_workers=4, shuffle=True)
-    valid_loader = DataLoader(oxford_valid, batch_size=4, num_workers=4, shuffle=False)
+    train_loader = DataLoader(oxford_train, batch_size=2, num_workers=4, shuffle=True)
+    valid_loader = DataLoader(oxford_valid, batch_size=2, num_workers=4, shuffle=False)
 
     # Create cuda parameters
     use_cuda = torch.cuda.is_available()
@@ -58,13 +59,12 @@ def main(exp_num=1):
     print("Available device = ", device)
 
     # Create embedding network
-    resnet_model = models.resnet101(pretrained=True)
-    #resnet_model.fc = Identity()
-    model = TripletNet(resnet_model)
+    embedding_model = create_embedding_net()
+    model = TripletNet(embedding_model)
     model.to(device)
 
     # Create optimizer and scheduler
-    optimizer = optim.Adam(model.parameters(), lr=1e-4)
+    optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
 
     # Create log file
@@ -74,7 +74,7 @@ def main(exp_num=1):
     # Train
     tr_hist, val_hist = train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                     save_dir="./weights/", model_name="triplet_model.pth", 
-                    epochs=40, log_file=log_file)
+                    epochs=40, log_file=log_file, update_batch=10)
 
     # Close the file
     log_file.close()

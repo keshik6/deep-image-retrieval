@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
+import torchvision.models as models
 
 class TripletNet(nn.Module):
 
@@ -58,3 +58,19 @@ class Identity(nn.Module):
 
     def forward(self, x):
         return x
+
+
+def create_embedding_net():
+    # This is a resnet50 base model
+    resnet_model = models.resnet50(pretrained=True)
+
+    # Now modify the network layers
+    resnet_model.fc = Identity()
+    resnet_model.avgpool =  Identity()   
+    print(resnet_model)
+
+    return resnet_model
+
+
+#create_embedding_net()
+
