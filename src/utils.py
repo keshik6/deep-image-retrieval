@@ -43,7 +43,7 @@ def get_preds_and_visualize(best_matches, query_gt_dict, img_dir, top_k_to_plot)
             preds.append(1)
         elif img_name in query_gt_dict['negative']:
             color_code = (255, 255, 0)
-            preds.append(1)
+            preds.append(0)
         else:
             color_code = (255, 0, 0)
             preds.append(0)
@@ -73,7 +73,7 @@ def get_preds(best_matches, query_gt_dict):
         if img_name in query_gt_dict['positive']:
             preds.append(1)
         elif img_name in query_gt_dict['negative']:
-            preds.append(1)
+            preds.append(0)
         else:
             preds.append(0)
         

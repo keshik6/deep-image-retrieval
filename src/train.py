@@ -38,9 +38,8 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     best_val_map = 0.0
     weights_path = os.path.join(save_dir, model_name)
     temp_weights_path = os.path.join(save_dir, "temp-{}".format(model_name))
-    valid_map_ = 0
+    valid_map_ = 0.0
     last_batch = math.ceil(len(train_loader.dataset)/update_batch)
-    infer=False
     
     # Each epoch has a training and validation phase
     for epoch in range(epochs):
@@ -103,7 +102,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                 # Calculate statistics and log
                 num_samples = float(len(train_loader.dataset))
                 tr_loss_ = running_loss.item()/num_samples
-                tr_map_, valid_map_ = inference_on_set(model=model, top_k=50, device=device)
+                tr_map_, valid_map_ = inference_on_set(model=model, top_k=25, device=device)
                 tr_loss.append(tr_loss_), tr_map.append(tr_map_)
                 print('> train_loss: {:.4f}\ttrain_mAP: {:.4f}'.format(tr_loss_, tr_map_))
                 log_file.write('> train_loss: {:.4f}\ttrain_mAP: {:.4f}\n'.format(tr_loss_, tr_map_))

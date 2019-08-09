@@ -37,7 +37,7 @@ class QueryExtractor():
         """
         all_file_list = sorted(os.listdir(self.labels_dir))
         query_list = [file for file in all_file_list if file.endswith('query.txt')]
-        return query_list
+        return sorted(query_list)
 
 
     def create_query_maps(self):
@@ -48,7 +48,8 @@ class QueryExtractor():
             query_image_name = self._get_query_image_name(query)
             tmp = dict()
             good_file, ok_file, junk_file = self._get_query_image_files(query)
-            tmp['positive'], tmp['negative'] = self._read_txt_file(good_file), self._read_txt_file(ok_file) + self._read_txt_file(junk_file)
+            tmp['positive'] = self._read_txt_file(good_file) + self._read_txt_file(ok_file) + self._read_txt_file(junk_file)
+            tmp['negative'] = self._get_bad_image_files(set(tmp['positive'] + [query_image_name]))
             self.query_map[query_image_name] = tmp
             self.query_names.append(query_image_name)
 
@@ -97,6 +98,15 @@ class QueryExtractor():
         file_path = os.path.join(self.labels_dir, query_file)
         line_list = ["{}.jpg".format(line.rstrip('\n').split()[0].replace("oxc1_", "")) for line in open(file_path)][0]
         return line_list
+
+    
+    def _get_bad_image_files(self, tmp_set):
+        """
+        Get all the negative images corresponding to query
+        """
+        all_set = set(self._get_all_image_files())
+        bad_list = list(all_set - tmp_set)
+        return bad_list
 
 
     def get_query_names(self):
@@ -185,12 +195,6 @@ class OxfordDataset(Dataset):
         return len(self.triplet_pairs)
 
     
-    def _normalize_np_array(self, img_pil, mean, std):
-        img = np.asarray(img_pil)/255.0
-        return (img-mean)/std
-
-
-
 class EmbeddingDataset(Dataset):
     def __init__(self, image_dir, query_img_list, transforms):
         if transforms == None:
