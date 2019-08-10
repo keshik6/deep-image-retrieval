@@ -67,7 +67,7 @@ def create_embedding_net():
     # Now modify the network layers
     resnet_model.fc = Identity()
     resnet_model.avgpool =  Identity()   
-    print(resnet_model)
+    #print(resnet_model)
 
     return resnet_model
 

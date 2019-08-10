@@ -60,7 +60,7 @@ def inference_on_single_labelled_image(query_img_file,
 
     # Create similarity list
     similarity = []
-    for file in QUERY_IMAGES_FTS:
+    for file in tqdm(QUERY_IMAGES_FTS):
         file_fts = np.squeeze(np.load(file))
         cos_sim = np.dot(query_fts, file_fts)/(np.linalg.norm(query_fts)*np.linalg.norm(file_fts))
         similarity.append(cos_sim)
@@ -75,14 +75,42 @@ def inference_on_single_labelled_image(query_img_file,
     if plot:
         preds = get_preds_and_visualize(best_matches, query_gt_dict, img_dir, 20)
     else:
-        preds = get_preds(best_matches, query_gt_dict, img_dir)
+        preds = get_preds(best_matches, query_gt_dict)
     
     # Get average precision
     ap = ap_at_k_per_query(preds, top_k)
     
-    print(ap)
+    #print(ap)
     return ap
 
 
+
+def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", subset="train"):
+    # Create Query extractor object
+    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset=subset)
+
+    # Creat image database
+    query_images = QUERY_EXTRACTOR.get_query_names()
+
+    # Create paths
+    query_image_paths = [os.path.join(img_dir, file) for file in query_images]
+
+    aps = []
+    # Now evaluate
+    for i in query_image_paths:
+        ap = inference_on_single_labelled_image(query_img_file=i, top_k=50,  weights_file="./weights/temp-triplet_model.pth", plot=False)
+        aps.append(ap)
+        print(ap)
+
+    
+    print(aps, np.array(aps).mean())
+    return np.array(aps).mean()
+
+
+
 if __name__ == '__main__':
-    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/bodleian_000132.jpg", weights_file="./weights/temp-triplet_model.pth")
+    validate(subset="train")
+    
+    
+    
+    #inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000051.jpg", weights_file="./weights/temp-triplet_model.pth")
