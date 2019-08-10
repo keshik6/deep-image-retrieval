@@ -9,7 +9,6 @@ from torchvision import transforms
 import torchvision.models as models
 from torch.utils.data import DataLoader
 import torch.optim as optim
-from inference import inference_on_set
 from train import train_model
 
 
@@ -28,16 +27,19 @@ def main(exp_num=1):
     # Create transformss
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    transforms_train = transforms.Compose([transforms.Resize(280),
+    transforms_train = transforms.Compose([transforms.Resize(256),
                                         transforms.RandomResizedCrop(224),                                 
                                         transforms.ColorJitter(brightness=(0.80, 1.20)),
                                         transforms.RandomHorizontalFlip(p = 0.50),
-                                        transforms.RandomRotation(15),
+                                        transforms.RandomChoice([
+                                            transforms.RandomRotation(15),
+                                            transforms.Grayscale(num_output_channels=3),
+                                        ]),
                                         transforms.ToTensor(), 
                                         transforms.Normalize(mean=mean, std=std),
                                         ])
 
-    transforms_valid = transforms.Compose([transforms.Resize(280),
+    transforms_valid = transforms.Compose([transforms.Resize(256),
                                             transforms.CenterCrop(224),                                 
                                             transforms.ToTensor(),
                                             transforms.Normalize(mean=mean, std=std),
@@ -48,8 +50,8 @@ def main(exp_num=1):
     oxford_valid = OxfordDataset(labels_dir, image_dir, q_valid, transforms=transforms_valid)
 
     # Create dataloader
-    train_loader = DataLoader(oxford_train, batch_size=4, num_workers=4, shuffle=True)
-    valid_loader = DataLoader(oxford_valid, batch_size=4, num_workers=4, shuffle=False)
+    train_loader = DataLoader(oxford_train, batch_size=5, num_workers=4, shuffle=True)
+    valid_loader = DataLoader(oxford_valid, batch_size=5, num_workers=4, shuffle=False)
 
     # Create cuda parameters
     use_cuda = torch.cuda.is_available()
@@ -61,11 +63,10 @@ def main(exp_num=1):
     # Create embedding network
     embedding_model = create_embedding_net()
     model = TripletNet(embedding_model)
-    model.load_state_dict(torch.load("./weights/temp-triplet_model.pth"))
     model.to(device)
 
     # Create optimizer and scheduler
-    optimizer = optim.Adam(model.parameters(), lr=5e-4, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
 
     # Create log file

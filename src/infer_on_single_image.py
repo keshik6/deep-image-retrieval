@@ -85,4 +85,4 @@ def inference_on_single_labelled_image(query_img_file,
 
 
 if __name__ == '__main__':
-    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000051.jpg", weights_file="./weights/temp-triplet_model.pth")
+    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/bodleian_000132.jpg", weights_file="./weights/temp-triplet_model.pth")
