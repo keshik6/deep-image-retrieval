@@ -35,7 +35,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     """
     tr_loss = []
     valid_loss = []
-    best_val_loss = -1.0
+    best_val_loss = np.iinfo(np.int32).max
     weights_path = os.path.join(save_dir, model_name)
     temp_weights_path = os.path.join(save_dir, "temp-{}".format(model_name))
     last_batch = math.ceil(len(train_loader.dataset)/update_batch)
@@ -137,7 +137,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
                 log_file.write('> valid_loss: {:.4f}\t'.format(valid_loss_))
                 
                 
-                if best_val_loss > valid_loss_:
+                if valid_loss_ < best_val_loss:
                     best_val_loss = valid_loss_
                     print("> Saving best weights...")
                     log_file.write("Saving best weights...\n")

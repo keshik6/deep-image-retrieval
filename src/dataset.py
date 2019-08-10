@@ -20,9 +20,9 @@ class QueryExtractor():
         self.query_list = self.create_query_list()
         self.query_names = []
         if subset == "train":
-            self.query_list = self.query_list[:-5]
+            self.query_list = self.query_list[:-15]
         else:
-            self.query_list = self.query_list[-5:]
+            self.query_list = self.query_list[-15:]
         self.query_map = dict()
         self.create_query_maps()
 
