@@ -10,7 +10,7 @@ import math
 
 class QueryExtractor():
 
-    def __init__(self, labels_dir, image_dir, subset, identifiers=['good', 'ok', 'junk']):
+    def __init__(self, labels_dir, image_dir, subset, query_suffix="oxc1_", identifiers=['good', 'ok', 'junk']):
         """
         Initialize the Query Extractor class
         """
@@ -21,6 +21,7 @@ class QueryExtractor():
         self.query_names = []
         self.subset = subset
         self.query_map = dict()
+        self.query_suffix = query_suffix
         self.create_query_maps()
 
         # Create triplet map
@@ -103,7 +104,7 @@ class QueryExtractor():
         Given a query file name (all_souls_query_1.txt) returns the actual query image inside the file (all_souls_00001.jpg)
         """
         file_path = os.path.join(self.labels_dir, query_file)
-        line_list = ["{}.jpg".format(line.rstrip('\n').split()[0].replace("oxc1_", "")) for line in open(file_path)][0]
+        line_list = ["{}.jpg".format(line.rstrip('\n').split()[0].replace(self.query_suffix, "")) for line in open(file_path)][0]
         return line_list
 
     
@@ -157,7 +158,7 @@ class QueryExtractor():
         return self.triplet_pairs
 
 
-class OxfordDataset(Dataset):
+class VggImageRetrievalDataset(Dataset):
 
     def __init__(self, labels_dir, image_dir, triplet_pair_generator, transforms=None):
         self.labels_dir = labels_dir
@@ -232,7 +233,7 @@ class EmbeddingDataset(Dataset):
 # labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
 
 # # Create Query extractor object
-# q = QueryExtractor(labels_dir, image_dir, "train")
+# q = QueryExtractor(labels_dir, image_dir, subset="train", query_suffix="oxc1_")
 
 # # Get query list and query map
 # triplets = q.get_triplets()
@@ -243,14 +244,14 @@ class EmbeddingDataset(Dataset):
 # import torch
 # mean = [0.485, 0.456, 0.406]
 # std = [0.229, 0.224, 0.225]
-# transforms_test = transforms.Compose([transforms.Resize(460),
-#                                     transforms.RandomResizedCrop(448),
+# transforms_test = transforms.Compose([transforms.Resize(256),
+#                                     transforms.RandomResizedCrop(224, scale=(0.8, 1.2)),
 #                                     transforms.ToTensor(),
 #                                     #transforms.Normalize(mean=mean, std=std),                                 
 #                                     ])
 # # Create dataset
-# ox = OxfordDataset(labels_dir, image_dir, q, transforms=transforms_test)
-# a, p, n = ox.__getitem__(100)
+# ox = VggImageRetrievalDataset(labels_dir, image_dir, q, transforms=transforms_test)
+# a, p, n = ox.__getitem__(1)
 # plt.imshow(a.numpy().transpose(1, 2, 0))
 # plt.show()
 

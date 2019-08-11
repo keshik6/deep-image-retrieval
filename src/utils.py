@@ -61,7 +61,6 @@ def get_preds_and_visualize(best_matches, query_gt_dict, img_dir, top_k_to_plot)
     return preds
 
 
-
 def get_preds(best_matches, query_gt_dict):
    
     # Create python list to store preds
@@ -79,8 +78,6 @@ def get_preds(best_matches, query_gt_dict):
         
     return preds
 
-# ar = np.array([1, 0, 1, 1, 1, 0, 0])
-# print(average_precision_for_query(ar))
 
 def plot_history(train_hist, val_hist, y_label, filename, labels=["train", "validation"]):
     """

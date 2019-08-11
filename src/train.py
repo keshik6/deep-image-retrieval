@@ -5,7 +5,6 @@ import os
 import numpy as np
 from sklearn.metrics import cohen_kappa_score
 from model import TripletLoss, TripletNet, Identity
-from dataset import QueryExtractor, OxfordDataset
 from torchvision import transforms
 import torchvision.models as models
 from torch.utils.data import DataLoader
@@ -13,9 +12,11 @@ import torch.optim as optim
 # from inference import inference_on_set
 import math
 
-def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
-                save_dir="./weights/", model_name="triplet.pth", 
-                epochs=20, log_file=None, update_batch=10):
+def train_model(model, device, optimizer, scheduler, 
+                train_loader, valid_loader, 
+                epochs, update_batch, model_name,
+                save_dir, 
+                log_file):
     """
     Train a deep neural network model
     
@@ -49,7 +50,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
         criterion = TripletLoss(margin=2)
         train_loader.dataset.reset()
         
-        if (epoch+1)%3 == 0:
+        if (epoch+1)%update_batch == 0:
             print("> Modifying learning rate")
             scheduler.step()
             

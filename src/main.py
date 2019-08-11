@@ -4,32 +4,34 @@ import gc
 import os
 import numpy as np
 from model import TripletLoss, TripletNet, Identity, create_embedding_net
-from dataset import QueryExtractor, OxfordDataset
+from dataset import QueryExtractor, VggImageRetrievalDataset
 from torchvision import transforms
 import torchvision.models as models
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from train import train_model
 from utils import plot_history
+import math
 
+def main(data_dir, results_dir, weights_dir,
+        which_dataset, image_resize, image_crop_size, 
+        exp_num,
+        max_epochs, batch_size, samples_update_size, 
+        num_workers=4, lr=1e-6, weight_decay=1e-5):
 
-def main(exp_num=1):
     # Define directories
-    labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
+    labels_dir = os.path.join(data_dir, which_dataset, "gt_files")
+    image_dir = os.path.join(data_dir, which_dataset, "images")
 
     # Create Query extractor object
     q_train = QueryExtractor(labels_dir, image_dir, subset="train")
     q_valid = QueryExtractor(labels_dir, image_dir, subset="valid")
 
-    # Get query list and query map
-    # triplets_train, triplets_valid = q_train.get_triplets(), q_valid.get_triplets() 
-    # print(len(triplets_train), len(triplets_valid))
-
     # Create transformss
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    transforms_train = transforms.Compose([transforms.Resize(256),
-                                        transforms.RandomResizedCrop(224),                                 
+    transforms_train = transforms.Compose([transforms.Resize(image_resize),
+                                        transforms.RandomResizedCrop(image_crop_size, scale=(0.8, 1.2)),                                 
                                         transforms.ColorJitter(brightness=(0.80, 1.20)),
                                         transforms.RandomHorizontalFlip(p = 0.50),
                                         transforms.RandomChoice([
@@ -40,51 +42,66 @@ def main(exp_num=1):
                                         transforms.Normalize(mean=mean, std=std),
                                         ])
 
-    transforms_valid = transforms.Compose([transforms.Resize(256),
-                                            transforms.CenterCrop(224),                                 
+    transforms_valid = transforms.Compose([transforms.Resize(image_resize),
+                                            transforms.CenterCrop(image_crop_size),                                 
                                             transforms.ToTensor(),
                                             transforms.Normalize(mean=mean, std=std),
                                             ])
 
     # Create dataset
-    oxford_train = OxfordDataset(labels_dir, image_dir, q_train, transforms=transforms_train)
-    oxford_valid = OxfordDataset(labels_dir, image_dir, q_valid, transforms=transforms_valid)
+    dataset_train = VggImageRetrievalDataset(labels_dir, image_dir, q_train, transforms=transforms_train)
+    dataset_valid = VggImageRetrievalDataset(labels_dir, image_dir, q_valid, transforms=transforms_valid)
 
     # Create dataloader
-    train_loader = DataLoader(oxford_train, batch_size=5, num_workers=4, shuffle=True)
-    valid_loader = DataLoader(oxford_valid, batch_size=5, num_workers=4, shuffle=False)
+    train_loader = DataLoader(dataset_train, batch_size=batch_size, num_workers=4, shuffle=True)
+    valid_loader = DataLoader(dataset_valid, batch_size=batch_size, num_workers=4, shuffle=False)
 
     # Create cuda parameters
     use_cuda = torch.cuda.is_available()
     np.random.seed(2019)
     torch.manual_seed(2019)
     device = torch.device("cuda" if use_cuda else "cpu")
-    print("Available device = ", device)
 
     # Create embedding network
     embedding_model = create_embedding_net()
     model = TripletNet(embedding_model)
-    model.to(device)
+    #model.to(device)
 
     # Create optimizer and scheduler
-    optimizer = optim.Adam(model.parameters(), lr=1e-6, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
 
     # Create log file
-    log_file =  open(os.path.join("./results", "log-{}.txt".format(exp_num)), "w+")
+    log_file =  open(os.path.join(results_dir, "log-{}.txt".format(exp_num)), "w+")
     log_file.write("----------Experiment {}----------\n".format(exp_num))
-    log_file.write("Image size=224\n")
+    log_file.write("Dataset = {}, Image sizes = {}, {}\n".format(which_dataset, image_resize, image_crop_size))
 
-    # Train
+    # Creat batch update value
+    update_batch = int(math.ceil(float(samples_update_size)/batch_size))
+    model_name = "{}-exp-{}.pth".format(which_dataset, exp_num)
+    loss_plot_save_path = os.path.join(results_dir, "{}-loss-exp-{}.png".format(which_dataset, exp_num))
+
+    # Print stats before starting training
+    print("Running VGG Image Retrieval Training script")
+    print("Dataset used\t\t:{}".format(which_dataset))
+    print("Max epochs\t\t: {}".format(max_epochs))
+    print("Gradient update\t\t: every {} batches ({} samples)".format(update_batch, samples_update_size))
+    print("Initial Learning rate\t: {}".format(lr))
+    print("Image resize, crop size\t: {}, {}".format(image_resize, image_crop_size))
+    print("Available device \t:", device)
+
+    # Train the triplet network
     tr_hist, val_hist = train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
-                    save_dir="./weights/", model_name="triplet_model_oxford.pth", 
-                    epochs=50, log_file=log_file, update_batch=7)
+                    epochs=max_epochs, update_batch=update_batch, model_name=model_name, 
+                    save_dir=weights_dir, log_file=log_file)
 
     # Close the file
     log_file.close()
 
     # Plot and save
-    plot_history(tr_hist, val_hist, "loss", "./results/loss.png", labels=["train", "validation"])
+    plot_history(tr_hist, val_hist, "Triplet Loss", loss_plot_save_path, labels=["train", "validation"])
 
 if __name__ == '__main__':
-    main()
+    main(data_dir="./data/", results_dir="./results", weights_dir="./weights",
+        which_dataset="oxbuild", image_resize=256, image_crop_size=224,
+        exp_num=1, max_epochs=3, batch_size=5, samples_update_size=50)
