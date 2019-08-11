@@ -3,6 +3,9 @@ import cv2
 from PIL import Image
 import matplotlib.pyplot as plt
 import os
+from skimage.measure import compare_ssim
+import cv2
+from tqdm import tqdm
 
 def draw_label(img_path, color_code):
     img = Image.open(img_path)
@@ -103,3 +106,44 @@ def plot_history(train_hist, val_hist, y_label, filename, labels=["train", "vali
     plt.ylabel(y_label)
     plt.savefig(filename)
     plt.show()
+
+
+def center_crop_numpy(img, cropx, cropy):
+    y,x = img.shape[:-1]
+    startx = x//2-(cropx//2)
+    starty = y//2-(cropy//2)
+    return img[starty:starty+cropy, startx:startx+cropx, :]
+
+
+def template_matching(target_img_path, compare_img_path_list, img_dir):
+    
+    ssim = []
+    for other_img_path in tqdm(compare_img_path_list):
+        # load the two input images
+        image_target = cv2.imread(os.path.join(img_dir, target_img_path))
+        image_other = cv2.imread(os.path.join(img_dir, other_img_path))
+        
+        image_target = center_crop_numpy(image_target, 500, 500)
+        image_other = center_crop_numpy(image_other, 500, 500)
+
+        if image_target.shape != image_other.shape:
+            continue
+
+        # convert the images to grayscale
+        gray_target = cv2.cvtColor(image_target, cv2.COLOR_BGR2GRAY)
+        gray_other = cv2.cvtColor(image_other, cv2.COLOR_BGR2GRAY)
+
+        # compute the Structural Similarity Index (SSIM) between the two
+        # images, ensuring that the difference image is returned
+        score = compare_ssim(gray_target, gray_other, full=False)
+        ssim.append(score)
+
+    indexes = (-np.array(ssim)).argsort()[:500]
+    final_results = [compare_img_path_list[index] for index in indexes]
+    print(final_results)
+    return final_results
+
+
+# files = [os.path.join("./data/oxbuild/images", file) for file in os.listdir("./data/oxbuild/images/")]
+# print(files)
+# template_matching("./data/oxbuild/images/all_souls_000051.jpg", files)

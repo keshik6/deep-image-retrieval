@@ -7,10 +7,11 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import itertools
 import math
+from utils import template_matching
 
 class QueryExtractor():
 
-    def __init__(self, labels_dir, image_dir, subset, query_suffix="oxc1_", identifiers=['good', 'ok', 'junk']):
+    def __init__(self, labels_dir, image_dir, subset, query_suffix="oxc1_", identifiers=['good', 'ok', 'junk', 'bad']):
         """
         Initialize the Query Extractor class
         """
@@ -45,9 +46,14 @@ class QueryExtractor():
         for query in self.query_list:
             query_image_name = self._get_query_image_name(query)
             tmp = dict()
-            good_file, ok_file, junk_file = self._get_query_image_files(query)
+            good_file, ok_file, junk_file, bad_file = self._get_query_image_files(query)
             tmp['positive'] = self._read_txt_file(good_file) + self._read_txt_file(ok_file) + self._read_txt_file(junk_file)
-            tmp['negative'] = self._get_bad_image_files(set(tmp['positive'] + [query_image_name]))
+
+            if not os.path.exists(os.path.join(self.labels_dir, bad_file)):
+                tmp['negative'] = self._read_txt_file(bad_file)
+            else:
+                tmp['negative'] = self._get_remaining_image_files(set(tmp['positive'] + [query_image_name]))
+                tmp['negative'] = self._create_bad_image_files(query, query_image_name, tmp['negative'][:100])
 
             # Split into 80%, 20% for training and validation
             split = int(math.ceil(len(tmp['positive'])*0.80))
@@ -66,9 +72,9 @@ class QueryExtractor():
         """
         This returns the txt file names of good, ok and junk files corresponding to the query file name
         """
-        good_file, ok_file, junk_file = query_file.replace('query', self.identifiers[0]), query_file.replace('query', self.identifiers[1]),\
-            query_file.replace('query', self.identifiers[2])
-        return good_file, ok_file, junk_file
+        good_file, ok_file, junk_file, bad_file = query_file.replace('query', self.identifiers[0]), query_file.replace('query', self.identifiers[1]),\
+            query_file.replace('query', self.identifiers[2]), query_file.replace('query', self.identifiers[3])
+        return good_file, ok_file, junk_file, bad_file
 
 
     def _read_txt_file(self, txt_file_name):
@@ -108,7 +114,7 @@ class QueryExtractor():
         return line_list
 
     
-    def _get_bad_image_files(self, tmp_set):
+    def _get_remaining_image_files(self, tmp_set):
         """
         Get all the negative images corresponding to query
         """
@@ -145,6 +151,17 @@ class QueryExtractor():
             triplet_list = [[anchor_positive_pairs[i], anchor_negative_pairs[i]] for i in range(low_bound)]
             self.triplet_pairs.extend(triplet_list)
         
+    
+    def _create_bad_image_files(self, query_txt_file, target_img_path, compare_img_list):
+        bad_file_name = os.path.join(self.labels_dir, query_txt_file.replace('query', "bad"))
+        neg_list = template_matching(target_img_path, compare_img_list, self.image_dir)
+
+        with open(bad_file_name, 'w+') as f:
+            for item in neg_list:
+                f.write("%s\n" % item.replace(".jpg", ""))
+        
+        return neg_list
+
 
     def get_triplets(self):
         shuffle(self.triplet_pairs)
@@ -156,6 +173,8 @@ class QueryExtractor():
         self._generate_triplets()
         shuffle(self.triplet_pairs)
         return self.triplet_pairs
+
+    
 
 
 class VggImageRetrievalDataset(Dataset):
@@ -229,37 +248,37 @@ class EmbeddingDataset(Dataset):
         return self.filenames
 
 
-# # Define directories
-# labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
+# Define directories
+labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
 
-# # Create Query extractor object
-# q = QueryExtractor(labels_dir, image_dir, subset="train", query_suffix="oxc1_")
+# Create Query extractor object
+q = QueryExtractor(labels_dir, image_dir, subset="train", query_suffix="oxc1_")
 
-# # Get query list and query map
-# triplets = q.get_triplets()
-# print(len(triplets))
-# print(q.get_query_names())
+# Get query list and query map
+triplets = q.get_triplets()
+print(len(triplets))
+print(q.get_query_names())
 
-# from torchvision import transforms
-# import torch
-# mean = [0.485, 0.456, 0.406]
-# std = [0.229, 0.224, 0.225]
-# transforms_test = transforms.Compose([transforms.Resize(256),
-#                                     transforms.RandomResizedCrop(224, scale=(0.8, 1.2)),
-#                                     transforms.ToTensor(),
-#                                     #transforms.Normalize(mean=mean, std=std),                                 
-#                                     ])
-# # Create dataset
-# ox = VggImageRetrievalDataset(labels_dir, image_dir, q, transforms=transforms_test)
-# a, p, n = ox.__getitem__(1)
-# plt.imshow(a.numpy().transpose(1, 2, 0))
-# plt.show()
+from torchvision import transforms
+import torch
+mean = [0.485, 0.456, 0.406]
+std = [0.229, 0.224, 0.225]
+transforms_test = transforms.Compose([transforms.Resize(256),
+                                    transforms.RandomResizedCrop(224, scale=(0.8, 1.2)),
+                                    transforms.ToTensor(),
+                                    #transforms.Normalize(mean=mean, std=std),                                 
+                                    ])
+# Create dataset
+ox = VggImageRetrievalDataset(labels_dir, image_dir, q, transforms=transforms_test)
+a, p, n = ox.__getitem__(1)
+plt.imshow(a.numpy().transpose(1, 2, 0))
+plt.show()
 
-# plt.imshow(p.numpy().transpose(1, 2, 0))
-# plt.show()
+plt.imshow(p.numpy().transpose(1, 2, 0))
+plt.show()
 
-# plt.imshow(n.numpy().transpose(1, 2, 0))
-# plt.show()
+plt.imshow(n.numpy().transpose(1, 2, 0))
+plt.show()
 
 
 
