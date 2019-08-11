@@ -6,6 +6,7 @@ import os
 from skimage.measure import compare_ssim
 import cv2
 from tqdm import tqdm
+from sklearn.decomposition import PCA
 
 def draw_label(img_path, color_code):
     img = Image.open(img_path)
@@ -113,6 +114,28 @@ def center_crop_numpy(img, cropx, cropy):
     startx = x//2-(cropx//2)
     starty = y//2-(cropy//2)
     return img[starty:starty+cropy, startx:startx+cropx, :]
+
+
+# def perform_pca_on_database():
+#     # Creat image database
+#     QUERY_IMAGES_FTS = [os.path.join("./fts/", file) for file in sorted(os.listdir("./fts/"))]
+#     QUERY_NAMES = sorted(os.listdir("./fts/"))
+    
+#     pca = PCA(n_components=2)
+#     for file in tqdm(QUERY_IMAGES_FTS):
+#         file_fts = np.squeeze(np.load(file)).reshape(2048, -1)
+#         pca.fit(file_fts)
+#         x = pca.transform(file_fts)
+#         target_file_name = os.path.join("./fts_reduced/", file.split("/")[-1])
+#         np.save(target_file_name, x.flatten())
+
+
+def perform_pca_on_single_vector(ft_np_vector, n_components=2, reshape_dim=2048):
+    pca = PCA(n_components=n_components, whiten=True)
+    file_fts = ft_np_vector.reshape(reshape_dim, -1)
+    pca.fit(file_fts)
+    x = pca.transform(file_fts)
+    return x.flatten()
 
 
 def template_matching(target_img_path, compare_img_path_list, img_dir):
