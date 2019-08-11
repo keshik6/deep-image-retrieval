@@ -49,11 +49,11 @@ class QueryExtractor():
             good_file, ok_file, junk_file, bad_file = self._get_query_image_files(query)
             tmp['positive'] = self._read_txt_file(good_file) + self._read_txt_file(ok_file) + self._read_txt_file(junk_file)
 
-            if not os.path.exists(os.path.join(self.labels_dir, bad_file)):
+            if os.path.exists(os.path.join(self.labels_dir, bad_file)):
                 tmp['negative'] = self._read_txt_file(bad_file)
             else:
                 tmp['negative'] = self._get_remaining_image_files(set(tmp['positive'] + [query_image_name]))
-                tmp['negative'] = self._create_bad_image_files(query, query_image_name, tmp['negative'][:100])
+                tmp['negative'] = self._create_bad_image_files(query, query_image_name, tmp['negative'])
 
             # Split into 80%, 20% for training and validation
             split = int(math.ceil(len(tmp['positive'])*0.80))
@@ -249,7 +249,7 @@ class EmbeddingDataset(Dataset):
 
 
 # Define directories
-labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
+labels_dir, image_dir = "./data/oxford/gt_files/", "./data/oxford/images/"
 
 # Create Query extractor object
 q = QueryExtractor(labels_dir, image_dir, subset="train", query_suffix="oxc1_")
