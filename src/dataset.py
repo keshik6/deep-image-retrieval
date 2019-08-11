@@ -52,7 +52,8 @@ class QueryExtractor():
             if os.path.exists(os.path.join(self.labels_dir, bad_file)):
                 tmp['negative'] = self._read_txt_file(bad_file)
             else:
-                tmp['negative'] = self._get_remaining_image_files(set(tmp['positive'] + [query_image_name]))
+                print("> Creating hard negative samples for query:", query)
+                tmp['negative'] = self._get_remaining_image_files(set(tmp['positive'] + [query_image_name] + self._get_blacklist()))
                 tmp['negative'] = self._create_bad_image_files(query, query_image_name, tmp['negative'])
 
             # Split into 80%, 20% for training and validation
@@ -153,14 +154,48 @@ class QueryExtractor():
         
     
     def _create_bad_image_files(self, query_txt_file, target_img_path, compare_img_list):
+        # Create a list of dummy files since same landscape queries have the same ground truth
         bad_file_name = os.path.join(self.labels_dir, query_txt_file.replace('query', "bad"))
-        neg_list = template_matching(target_img_path, compare_img_list, self.image_dir)
 
-        with open(bad_file_name, 'w+') as f:
-            for item in neg_list:
-                f.write("%s\n" % item.replace(".jpg", ""))
+        target_bad_files = []
+
+        for i in range(1, 6):
+            file_name = bad_file_name.replace("1", str(i))
+            target_bad_files.append(file_name)
+        
+        print(target_bad_files)
+
+        neg_list = template_matching(target_img_path, compare_img_list, self.image_dir)
+        
+        for bad_file in target_bad_files:
+            with open(bad_file, 'w+') as f:
+                for item in neg_list:
+                    f.write("%s\n" % item.replace(".jpg", ""))
         
         return neg_list
+
+    
+    def _get_blacklist(self):
+        return ["paris_louvre_000136.jpg",
+        "paris_louvre_000146.jpg",
+        "paris_moulinrouge_000422.jpg",
+        "paris_museedorsay_001059.jpg",
+        "paris_notredame_000188.jpg",
+        "paris_pantheon_000284.jpg",
+        "paris_pantheon_000960.jpg",
+        "paris_pantheon_000974.jpg",
+        "paris_pompidou_000195.jpg",
+        "paris_pompidou_000196.jpg",
+        "paris_pompidou_000201.jpg",
+        "paris_pompidou_000467.jpg",
+        "paris_pompidou_000640.jpg",
+        "paris_sacrecoeur_000299.jpg",
+        "paris_sacrecoeur_000330.jpg",
+        "paris_sacrecoeur_000353.jpg",
+        "paris_triomphe_000662.jpg",
+        "paris_triomphe_000833.jpg",
+        "paris_triomphe_000863.jpg",
+        "paris_triomphe_000867.jpg",]
 
 
     def get_triplets(self):
@@ -249,10 +284,10 @@ class EmbeddingDataset(Dataset):
 
 
 # Define directories
-labels_dir, image_dir = "./data/oxford/gt_files/", "./data/oxford/images/"
+labels_dir, image_dir = "./data/paris/gt_files/", "./data/paris/images/"
 
 # Create Query extractor object
-q = QueryExtractor(labels_dir, image_dir, subset="train", query_suffix="oxc1_")
+q = QueryExtractor(labels_dir, image_dir, subset="inference", query_suffix="oxc1_")
 
 # Get query list and query map
 triplets = q.get_triplets()

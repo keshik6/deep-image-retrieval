@@ -52,7 +52,7 @@ def inference_on_single_labelled_image(query_img_file,
     # Creat image database
     QUERY_IMAGES_FTS = [os.path.join(img_fts_dir, file) for file in sorted(os.listdir(img_fts_dir))]
     QUERY_IMAGES = [os.path.join(img_fts_dir, file) for file in sorted(os.listdir(img_dir))]
-
+    
     # Query fts
     query_fts =  get_query_embedding(model, device, query_img_file).detach().cpu().numpy()
 
@@ -108,4 +108,4 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
 
 if __name__ == '__main__':
     #validate(subset="train")
-    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/oxford_002985.jpg", weights_file="./weights/triplet_model_oxford.pth")
+    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/oxford_002985.jpg", weights_file="./weights/oxbuild-exp-1.pth")

@@ -17,7 +17,7 @@ def main(data_dir, results_dir, weights_dir,
         which_dataset, image_resize, image_crop_size, 
         exp_num,
         max_epochs, batch_size, samples_update_size, 
-        num_workers=4, lr=1e-6, weight_decay=1e-5):
+        num_workers=4, lr=5e-5, weight_decay=1e-5):
 
     # Define directories
     labels_dir = os.path.join(data_dir, which_dataset, "gt_files")

@@ -64,4 +64,4 @@ def create_embeddings_db(model_weights_path, img_dir="./data/oxbuild/images/", f
         
 
 if __name__ == '__main__':
-    create_embeddings_db("./weights/triplet_model_oxford.pth")
+    create_embeddings_db("./weights/oxbuild-exp-1.pth")
