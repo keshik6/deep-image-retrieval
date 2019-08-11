@@ -108,6 +108,7 @@ data/
 
 # features
 fts/
+fts_reduced/
 
 # results
 /results
