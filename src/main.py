@@ -67,17 +67,18 @@ def main(exp_num=1):
     model.to(device)
 
     # Create optimizer and scheduler
-    optimizer = optim.Adam(model.parameters(), lr=5e-5, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=1e-6, weight_decay=1e-5)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
 
     # Create log file
     log_file =  open(os.path.join("./results", "log-{}.txt".format(exp_num)), "w+")
     log_file.write("----------Experiment {}----------\n".format(exp_num))
+    log_file.write("Image size=224\n")
 
     # Train
     tr_hist, val_hist = train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
-                    save_dir="./weights/", model_name="triplet_model.pth", 
-                    epochs=3, log_file=log_file, update_batch=10)
+                    save_dir="./weights/", model_name="triplet_model_oxford.pth", 
+                    epochs=50, log_file=log_file, update_batch=7)
 
     # Close the file
     log_file.close()

@@ -37,7 +37,7 @@ def train_model(model, device, optimizer, scheduler, train_loader, valid_loader,
     valid_loss = []
     best_val_loss = np.iinfo(np.int32).max
     weights_path = os.path.join(save_dir, model_name)
-    temp_weights_path = os.path.join(save_dir, "temp-{}".format(model_name))
+    temp_weights_path = os.path.join(save_dir, "temp_{}".format(model_name))
     last_batch = math.ceil(len(train_loader.dataset)/update_batch)
     
     # Each epoch has a training and validation phase

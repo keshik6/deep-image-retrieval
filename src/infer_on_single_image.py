@@ -44,9 +44,7 @@ def inference_on_single_labelled_image(query_img_file,
     query_img_path = os.path.join(img_dir, query_img_name)
    
     # Create Query extractor object
-    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset="valid")
-    if query_img_name not in QUERY_EXTRACTOR.get_query_names():
-        QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset="train")
+    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset="inference")
     
     # Create query ground truth dictionary
     query_gt_dict = QUERY_EXTRACTOR.get_query_map()[query_img_name]
@@ -80,7 +78,7 @@ def inference_on_single_labelled_image(query_img_file,
     # Get average precision
     ap = ap_at_k_per_query(preds, top_k)
     
-    #print(ap)
+    print(ap)
     return ap
 
 
@@ -110,4 +108,4 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
 
 if __name__ == '__main__':
     #validate(subset="train")
-    #inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/pitt_rivers_000087.jpg", weights_file="./weights/temp-triplet_model.pth")
+    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000013.jpg", weights_file="./weights/temp-triplet_model.pth")
