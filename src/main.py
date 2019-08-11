@@ -53,8 +53,8 @@ def main(data_dir, results_dir, weights_dir,
     dataset_valid = VggImageRetrievalDataset(labels_dir, image_dir, q_valid, transforms=transforms_valid)
 
     # Create dataloader
-    train_loader = DataLoader(dataset_train, batch_size=batch_size, num_workers=4, shuffle=True)
-    valid_loader = DataLoader(dataset_valid, batch_size=batch_size, num_workers=4, shuffle=False)
+    train_loader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True)
+    valid_loader = DataLoader(dataset_valid, batch_size=batch_size, num_workers=num_workers, shuffle=False)
 
     # Create cuda parameters
     use_cuda = torch.cuda.is_available()
@@ -65,7 +65,7 @@ def main(data_dir, results_dir, weights_dir,
     # Create embedding network
     embedding_model = create_embedding_net()
     model = TripletNet(embedding_model)
-    #model.to(device)
+    model.to(device)
 
     # Create optimizer and scheduler
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -104,4 +104,4 @@ def main(data_dir, results_dir, weights_dir,
 if __name__ == '__main__':
     main(data_dir="./data/", results_dir="./results", weights_dir="./weights",
         which_dataset="oxbuild", image_resize=256, image_crop_size=224,
-        exp_num=1, max_epochs=3, batch_size=5, samples_update_size=50)
+        exp_num=1, max_epochs=40, batch_size=5, samples_update_size=32)

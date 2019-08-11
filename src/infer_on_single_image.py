@@ -108,4 +108,4 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
 
 if __name__ == '__main__':
     #validate(subset="train")
-    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000013.jpg", weights_file="./weights/temp-triplet_model.pth")
+    inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/oxford_002985.jpg", weights_file="./weights/triplet_model_oxford.pth")
