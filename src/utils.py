@@ -81,3 +81,28 @@ def get_preds(best_matches, query_gt_dict):
 
 # ar = np.array([1, 0, 1, 1, 1, 0, 0])
 # print(average_precision_for_query(ar))
+
+def plot_history(train_hist, val_hist, y_label, filename, labels=["train", "validation"]):
+    """
+    Plot training and validation history
+    
+    Args:
+        train_hist: numpy array consisting of train history values (loss/ accuracy metrics)
+        valid_hist: numpy array consisting of validation history values (loss/ accuracy metrics)
+        y_label: label for y_axis
+        filename: filename to store the resulting plot
+        labels: legend for the plot
+        
+    Returns:
+        None
+    """
+    # Plot loss and accuracy
+    xi = [i for i in range(0, len(train_hist), 2)]
+    plt.plot(train_hist, label = labels[0])
+    plt.plot(val_hist, label = labels[1])
+    plt.xticks(xi)
+    plt.legend()
+    plt.xlabel("Epoch")
+    plt.ylabel(y_label)
+    plt.savefig(filename)
+    plt.show()

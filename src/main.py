@@ -10,6 +10,7 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 import torch.optim as optim
 from train import train_model
+from utils import plot_history
 
 
 def main(exp_num=1):
@@ -66,7 +67,7 @@ def main(exp_num=1):
     model.to(device)
 
     # Create optimizer and scheduler
-    optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=5e-5, weight_decay=1e-5)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
 
     # Create log file
@@ -76,10 +77,13 @@ def main(exp_num=1):
     # Train
     tr_hist, val_hist = train_model(model, device, optimizer, scheduler, train_loader, valid_loader,  
                     save_dir="./weights/", model_name="triplet_model.pth", 
-                    epochs=40, log_file=log_file, update_batch=10)
+                    epochs=3, log_file=log_file, update_batch=10)
 
     # Close the file
     log_file.close()
+
+    # Plot and save
+    plot_history(tr_hist, val_hist, "loss", "./results/loss.png", labels=["train", "validation"])
 
 if __name__ == '__main__':
     main()

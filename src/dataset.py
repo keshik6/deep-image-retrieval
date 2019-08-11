@@ -6,7 +6,7 @@ from torchvision import transforms
 from PIL import Image
 import matplotlib.pyplot as plt
 import itertools
-
+import math
 
 class QueryExtractor():
 
@@ -19,10 +19,7 @@ class QueryExtractor():
         self.identifiers = identifiers
         self.query_list = self.create_query_list()
         self.query_names = []
-        if subset == "train":
-            self.query_list = self.query_list[:-15]
-        else:
-            self.query_list = self.query_list[-15:]
+        self.subset = subset
         self.query_map = dict()
         self.create_query_maps()
 
@@ -50,6 +47,16 @@ class QueryExtractor():
             good_file, ok_file, junk_file = self._get_query_image_files(query)
             tmp['positive'] = self._read_txt_file(good_file) + self._read_txt_file(ok_file) + self._read_txt_file(junk_file)
             tmp['negative'] = self._get_bad_image_files(set(tmp['positive'] + [query_image_name]))
+
+            # Split into 80%, 20% for training and validation
+            split = int(math.ceil(len(tmp['positive'])*0.80))
+            if self.subset == "train":
+                tmp['positive'] = tmp['positive'][:split]
+            elif self.subset == "valid":
+                tmp['positive'] = tmp['positive'][split:]
+            else:
+                tmp['positive'] = tmp['positive']
+
             self.query_map[query_image_name] = tmp
             self.query_names.append(query_image_name)
 
@@ -144,6 +151,7 @@ class QueryExtractor():
 
     
     def reset(self):
+        print("> Resetting dataset")
         self._generate_triplets()
         shuffle(self.triplet_pairs)
         return self.triplet_pairs
@@ -224,20 +232,24 @@ class EmbeddingDataset(Dataset):
 # labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
 
 # # Create Query extractor object
-# q = QueryExtractor(labels_dir, image_dir, "valid")
+# q = QueryExtractor(labels_dir, image_dir, "train")
 
 # # Get query list and query map
 # triplets = q.get_triplets()
+# print(len(triplets))
+# print(q.get_query_names())
 
 # from torchvision import transforms
 # import torch
+# mean = [0.485, 0.456, 0.406]
+# std = [0.229, 0.224, 0.225]
 # transforms_test = transforms.Compose([transforms.Resize(460),
 #                                     transforms.RandomResizedCrop(448),
 #                                     transforms.ToTensor(),
 #                                     #transforms.Normalize(mean=mean, std=std),                                 
 #                                     ])
 # # Create dataset
-# ox = OxfordDataset(labels_dir, image_dir, triplets, transforms_test)
+# ox = OxfordDataset(labels_dir, image_dir, q, transforms=transforms_test)
 # a, p, n = ox.__getitem__(100)
 # plt.imshow(a.numpy().transpose(1, 2, 0))
 # plt.show()
@@ -247,12 +259,6 @@ class EmbeddingDataset(Dataset):
 
 # plt.imshow(n.numpy().transpose(1, 2, 0))
 # plt.show()
-
-
-
-
-
-
 
 
 

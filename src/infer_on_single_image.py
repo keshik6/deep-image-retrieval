@@ -85,9 +85,9 @@ def inference_on_single_labelled_image(query_img_file,
 
 
 
-def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", subset="train"):
+def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", subset="train", weights_file="./weights/temp-triplet_model.pth"):
     # Create Query extractor object
-    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset=subset)
+    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset="inference")
 
     # Creat image database
     query_images = QUERY_EXTRACTOR.get_query_names()
@@ -98,7 +98,7 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
     aps = []
     # Now evaluate
     for i in query_image_paths:
-        ap = inference_on_single_labelled_image(query_img_file=i, top_k=50,  weights_file="./weights/temp-triplet_model.pth", plot=False)
+        ap = inference_on_single_labelled_image(query_img_file=i, top_k=50, weights_file=weights_file, plot=False)
         aps.append(ap)
         print(ap)
 
@@ -109,8 +109,5 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
 
 
 if __name__ == '__main__':
-    validate(subset="train")
-    
-    
-    
-    #inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000051.jpg", weights_file="./weights/temp-triplet_model.pth")
+    #validate(subset="train")
+    #inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/pitt_rivers_000087.jpg", weights_file="./weights/temp-triplet_model.pth")
