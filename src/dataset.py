@@ -283,8 +283,8 @@ class EmbeddingDataset(Dataset):
         return self.filenames
 
 
-# Define directories
-# labels_dir, image_dir = "./data/paris/gt_files/", "./data/paris/images/"
+# # Define directories
+# labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
 
 # # Create Query extractor object
 # q = QueryExtractor(labels_dir, image_dir, subset="inference", query_suffix="oxc1_")
@@ -298,8 +298,8 @@ class EmbeddingDataset(Dataset):
 # import torch
 # mean = [0.485, 0.456, 0.406]
 # std = [0.229, 0.224, 0.225]
-# transforms_test = transforms.Compose([transforms.Resize(256),
-#                                     transforms.RandomResizedCrop(224, scale=(0.8, 1.2)),
+# transforms_test = transforms.Compose([transforms.Resize(460),
+#                                     transforms.RandomResizedCrop(448, scale=(0.8, 1.2)),
 #                                     transforms.ToTensor(),
 #                                     #transforms.Normalize(mean=mean, std=std),                                 
 #                                     ])
