@@ -83,7 +83,7 @@ class QueryExtractor():
         Given a text file, this function returns the lines as a list
         """
         file_path = os.path.join(self.labels_dir, txt_file_name)
-        line_list = ["{}.jpg".format(line.rstrip('\n')) for line in open(file_path)]
+        line_list = ["{}.jpg".format(line.rstrip('\n')) for line in open(file_path, errors='ignore')]
         return line_list
 
     
@@ -111,7 +111,7 @@ class QueryExtractor():
         Given a query file name (all_souls_query_1.txt) returns the actual query image inside the file (all_souls_00001.jpg)
         """
         file_path = os.path.join(self.labels_dir, query_file)
-        line_list = ["{}.jpg".format(line.rstrip('\n').split()[0].replace(self.query_suffix, "")) for line in open(file_path)][0]
+        line_list = ["{}.jpg".format(line.rstrip('\n').split()[0].replace(self.query_suffix, "")) for line in open(file_path, encoding="utf8")][0]
         return line_list
 
     
@@ -284,36 +284,36 @@ class EmbeddingDataset(Dataset):
 
 
 # Define directories
-labels_dir, image_dir = "./data/paris/gt_files/", "./data/paris/images/"
+# labels_dir, image_dir = "./data/paris/gt_files/", "./data/paris/images/"
 
-# Create Query extractor object
-q = QueryExtractor(labels_dir, image_dir, subset="inference", query_suffix="oxc1_")
+# # Create Query extractor object
+# q = QueryExtractor(labels_dir, image_dir, subset="inference", query_suffix="oxc1_")
 
-# Get query list and query map
-triplets = q.get_triplets()
-print(len(triplets))
-print(q.get_query_names())
+# # Get query list and query map
+# triplets = q.get_triplets()
+# print(len(triplets))
+# print(q.get_query_names())
 
-from torchvision import transforms
-import torch
-mean = [0.485, 0.456, 0.406]
-std = [0.229, 0.224, 0.225]
-transforms_test = transforms.Compose([transforms.Resize(256),
-                                    transforms.RandomResizedCrop(224, scale=(0.8, 1.2)),
-                                    transforms.ToTensor(),
-                                    #transforms.Normalize(mean=mean, std=std),                                 
-                                    ])
-# Create dataset
-ox = VggImageRetrievalDataset(labels_dir, image_dir, q, transforms=transforms_test)
-a, p, n = ox.__getitem__(1)
-plt.imshow(a.numpy().transpose(1, 2, 0))
-plt.show()
+# from torchvision import transforms
+# import torch
+# mean = [0.485, 0.456, 0.406]
+# std = [0.229, 0.224, 0.225]
+# transforms_test = transforms.Compose([transforms.Resize(256),
+#                                     transforms.RandomResizedCrop(224, scale=(0.8, 1.2)),
+#                                     transforms.ToTensor(),
+#                                     #transforms.Normalize(mean=mean, std=std),                                 
+#                                     ])
+# # Create dataset
+# ox = VggImageRetrievalDataset(labels_dir, image_dir, q, transforms=transforms_test)
+# a, p, n = ox.__getitem__(1)
+# plt.imshow(a.numpy().transpose(1, 2, 0))
+# plt.show()
 
-plt.imshow(p.numpy().transpose(1, 2, 0))
-plt.show()
+# plt.imshow(p.numpy().transpose(1, 2, 0))
+# plt.show()
 
-plt.imshow(n.numpy().transpose(1, 2, 0))
-plt.show()
+# plt.imshow(n.numpy().transpose(1, 2, 0))
+# plt.show()
 
 
 
