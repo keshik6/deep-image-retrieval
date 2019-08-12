@@ -3,14 +3,9 @@ import torch
 import gc
 import os
 import numpy as np
-from sklearn.metrics import cohen_kappa_score
-from model import TripletLoss, TripletNet, Identity
-from torchvision import transforms
-import torchvision.models as models
-from torch.utils.data import DataLoader
-import torch.optim as optim
-# from inference import inference_on_set
+from model import TripletLoss, TripletNet
 import math
+
 
 def train_model(model, device, optimizer, scheduler, 
                 train_loader, valid_loader, 

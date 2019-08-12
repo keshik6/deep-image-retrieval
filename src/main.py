@@ -3,7 +3,7 @@ import torch
 import gc
 import os
 import numpy as np
-from model import TripletLoss, TripletNet, Identity, create_embedding_net
+from model import TripletNet, create_embedding_net
 from dataset import QueryExtractor, VggImageRetrievalDataset
 from torchvision import transforms
 import torchvision.models as models

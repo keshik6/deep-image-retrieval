@@ -5,7 +5,6 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 from PIL import Image
 import matplotlib.pyplot as plt
-import itertools
 import math
 from utils import template_matching
 
