@@ -18,7 +18,33 @@ def main(data_dir, results_dir, weights_dir,
         exp_num,
         max_epochs, batch_size, samples_update_size, 
         num_workers=4, lr=5e-6, weight_decay=1e-5):
+    """
+    This is the main function. You need to interface only with this function to train. (It will record all the results)
+    Once you have trained use create_db.py to create the embeddings and then use the inference_on_single_image.py to test
+    
+    Arguments:
+        data_dir    : parent directory for data
+        results_dir : directory to store the results (Make sure you create this directory first)
+        weights_dir : directory to store the weights (Make sure you create this directory first)
+        which_dataset : "oxford" or "paris" 
+        image_resize : resize to this size
+        image_crop_size : square crop size
+        exp_num     : experiment number to record the log and results
+        max_epochs  : maximum epochs to run
+        batch_size  : batch size (I used 5)
+        samples_update_size : Number of samples the network should see before it performs one parameter update (I used 64)
+    
+    Keyword Arguments:
+        num_workers : default 4
+        lr      : Initial learning rate (default 5e-6)
+        weight_decay: default 1e-5
 
+    Eg run:
+        if __name__ == '__main__':
+            main(data_dir="./data/", results_dir="./results", weights_dir="./weights",
+            which_dataset="oxbuild", image_resize=460, image_crop_size=448,
+            exp_num=3, max_epochs=10, batch_size=5, samples_update_size=64)
+    """
     # Define directories
     labels_dir = os.path.join(data_dir, which_dataset, "gt_files")
     image_dir = os.path.join(data_dir, which_dataset, "images")
@@ -103,7 +129,8 @@ def main(data_dir, results_dir, weights_dir,
     # Plot and save
     plot_history(tr_hist, val_hist, "Triplet Loss", loss_plot_save_path, labels=["train", "validation"])
 
-if __name__ == '__main__':
-    main(data_dir="./data/", results_dir="./results", weights_dir="./weights",
-        which_dataset="oxbuild", image_resize=460, image_crop_size=448,
-        exp_num=3, max_epochs=10, batch_size=5, samples_update_size=64)
+    
+# if __name__ == '__main__':
+#     main(data_dir="./data/", results_dir="./results", weights_dir="./weights",
+#         which_dataset="oxbuild", image_resize=460, image_crop_size=448,
+#         exp_num=3, max_epochs=10, batch_size=5, samples_update_size=64)
