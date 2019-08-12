@@ -318,16 +318,16 @@ class EmbeddingDataset(Dataset):
         return self.filenames
 
 
-# # Define directories
-# labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
+# Define directories
+labels_dir, image_dir = "./data/paris/gt_files/", "./data/paris/images/"
 
-# # Create Query extractor object
-# q = QueryExtractor(labels_dir, image_dir, subset="inference", query_suffix="oxc1_")
+# Create Query extractor object
+q = QueryExtractor(labels_dir, image_dir, subset="train", query_suffix="oxc1_")
 
-# # Get query list and query map
-# triplets = q.get_triplets()
-# print(len(triplets))
-# print(q.get_query_names())
+# Get query list and query map
+triplets = q.get_triplets()
+print(len(triplets))
+print(q.get_query_names())
 
 # from torchvision import transforms
 # import torch
