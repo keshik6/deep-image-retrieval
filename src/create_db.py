@@ -65,7 +65,7 @@ def create_embeddings_db(model_weights_path, img_dir="./data/oxbuild/images/", f
         
 
 
-def create_embeddings_db_pca(model_weights_path, img_dir="./data/oxbuild/images/", fts_dir="./fts_reduced/"):
+def create_embeddings_db_pca(model_weights_path, img_dir="./data/paris/images/", fts_dir="./fts_pca/paris/"):
     
     # Create cuda parameters
     use_cuda = torch.cuda.is_available()
@@ -84,7 +84,37 @@ def create_embeddings_db_pca(model_weights_path, img_dir="./data/oxbuild/images/
                                         ])
 
     # Creat image database
-    QUERY_IMAGES = [os.path.join(img_dir, file) for file in sorted(os.listdir(img_dir))]
+    if "paris" in img_dir:
+        print("> Blacklisted images must be removed")
+        blacklist = ["paris_louvre_000136.jpg",
+        "paris_louvre_000146.jpg",
+        "paris_moulinrouge_000422.jpg",
+        "paris_museedorsay_001059.jpg",
+        "paris_notredame_000188.jpg",
+        "paris_pantheon_000284.jpg",
+        "paris_pantheon_000960.jpg",
+        "paris_pantheon_000974.jpg",
+        "paris_pompidou_000195.jpg",
+        "paris_pompidou_000196.jpg",
+        "paris_pompidou_000201.jpg",
+        "paris_pompidou_000467.jpg",
+        "paris_pompidou_000640.jpg",
+        "paris_sacrecoeur_000299.jpg",
+        "paris_sacrecoeur_000330.jpg",
+        "paris_sacrecoeur_000353.jpg",
+        "paris_triomphe_000662.jpg",
+        "paris_triomphe_000833.jpg",
+        "paris_triomphe_000863.jpg",
+        "paris_triomphe_000867.jpg",]
+        
+        files = os.listdir(img_dir)
+        for blacklisted_file in blacklist:
+            files.remove(blacklisted_file)
+
+        QUERY_IMAGES = [os.path.join(img_dir, file) for file in sorted(files)]
+
+    else:
+        QUERY_IMAGES = [os.path.join(img_dir, file) for file in sorted(os.listdir(img_dir))]
 
     # Create dataset
     eval_dataset = EmbeddingDataset(img_dir, QUERY_IMAGES, transforms=transforms_test)
@@ -121,4 +151,4 @@ def create_embeddings_db_pca(model_weights_path, img_dir="./data/oxbuild/images/
 
 
 if __name__ == '__main__':
-    create_embeddings_db("./weights/oxbuild-exp-1.pth")
+    create_embeddings_db_pca("./weights/paris-exp-1.pth")

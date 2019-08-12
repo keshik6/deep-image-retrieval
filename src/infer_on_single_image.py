@@ -84,10 +84,12 @@ def inference_on_single_labelled_image(query_img_file,
     return ap
 
 
-
-def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", subset="train", weights_file="./weights/temp-triplet_model.pth"):
+def validate(labels_dir, 
+            img_dir, img_fts_dir,
+            weights_file,
+            subset="inference"):
     # Create Query extractor object
-    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset="inference")
+    QUERY_EXTRACTOR = QueryExtractor(labels_dir, img_dir, subset=subset)
 
     # Creat image database
     query_images = QUERY_EXTRACTOR.get_query_names()
@@ -98,7 +100,7 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
     aps = []
     # Now evaluate
     for i in query_image_paths:
-        ap = inference_on_single_labelled_image(query_img_file=i, top_k=50, weights_file=weights_file, plot=False)
+        ap = inference_on_single_labelled_image_pca(query_img_file=i, labels_dir=labels_dir, img_dir=img_dir, img_fts_dir=img_fts_dir, weights_file=weights_file, plot=False)
         aps.append(ap)
         print(ap)
 
@@ -108,12 +110,12 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
 
 
 def inference_on_single_labelled_image_pca(query_img_file, 
-                labels_dir="./data/oxbuild/gt_files/", 
-                img_dir="./data/oxbuild/images/",
-                img_fts_dir="./fts_pca/oxbuild/",
-                top_k=50,
+                labels_dir,
+                img_dir,
+                img_fts_dir,
+                weights_file,
+                top_k=1000,
                 plot=True,
-                weights_file=None,
                 ):
     
     # Create cuda parameters
@@ -176,6 +178,12 @@ def inference_on_single_labelled_image_pca(query_img_file,
 
 
 if __name__ == '__main__':
-    #validate(subset="train")
+    #validate(labels_dir="./data/paris/gt_files/", img_dir="./data/paris/images/", img_fts_dir="./fts_pca/paris/", weights_file="./weights/paris-exp-1.pth")
     #inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-1.pth")
-    inference_on_single_labelled_image_pca(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-2.pth")
+    # inference_on_single_labelled_image_pca(query_img_file="./data/paris/images/paris_invalides_000072.jpg", 
+    #                                         labels_dir="./data/paris/gt_files/", 
+    #                                         img_dir="./data/paris/images/",
+    #                                         img_fts_dir="./fts_pca/paris/",
+    #                                         top_k=500,
+    #                                         plot=True,
+    #                                         weights_file="./weights/paris-exp-1.pth")

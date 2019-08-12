@@ -17,7 +17,7 @@ def main(data_dir, results_dir, weights_dir,
         which_dataset, image_resize, image_crop_size, 
         exp_num,
         max_epochs, batch_size, samples_update_size, 
-        num_workers=4, lr=1e-6, weight_decay=1e-5):
+        num_workers=4, lr=5e-6, weight_decay=1e-5):
 
     # Define directories
     labels_dir = os.path.join(data_dir, which_dataset, "gt_files")
@@ -65,6 +65,8 @@ def main(data_dir, results_dir, weights_dir,
     # Create embedding network
     embedding_model = create_embedding_net()
     model = TripletNet(embedding_model)
+    print("> Loading weight files")
+    model.load_state_dict(torch.load("./weights/oxbuild-exp-2.pth"))
     model.to(device)
 
     # Create optimizer and scheduler
@@ -104,4 +106,4 @@ def main(data_dir, results_dir, weights_dir,
 if __name__ == '__main__':
     main(data_dir="./data/", results_dir="./results", weights_dir="./weights",
         which_dataset="oxbuild", image_resize=460, image_crop_size=448,
-        exp_num=2, max_epochs=25, batch_size=5, samples_update_size=64)
+        exp_num=3, max_epochs=10, batch_size=5, samples_update_size=64)

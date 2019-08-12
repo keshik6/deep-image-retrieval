@@ -185,7 +185,6 @@ def template_matching(target_img_path, compare_img_path_list, img_dir):
 
     indexes = (-np.array(ssim)).argsort()[:500]
     final_results = [compare_img_path_list[index] for index in indexes]
-    print(final_results)
     return final_results
 
 
