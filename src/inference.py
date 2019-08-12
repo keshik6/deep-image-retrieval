@@ -7,11 +7,18 @@ from PIL import Image
 from torchvision import transforms
 import torch
 
-def get_query_embedding(model, 
-                        device,
-                        query_img_file,  
-                        ):
-    
+def get_query_embedding(model, device, query_img_file):
+    """
+    Given a query image file path run through the model and return the embeddings
+
+    Args:
+        model           : model instance
+        device          : cuda or cpu
+        query_img_file  : location of the query image file
+
+    Returns:
+        The resulting embeddings
+    """
     model.eval()
 
     # Read image
