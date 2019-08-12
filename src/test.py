@@ -3,6 +3,8 @@ import os
 import numpy as np
 import torch
 import torch.nn.functional as F
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import label_ranking_average_precision_score
 
 if __name__ == '__main__' :
     # Create query fts
@@ -33,6 +35,15 @@ if __name__ == '__main__' :
     # print(j)
     # print(query_fts[j])
 
-    m = torch.cat((query_fts, torch.tensor([8.0, 9.0, 10.0])), 0)
-    print(m)
+    # m = torch.cat((query_fts, torch.tensor([8.0, 9.0, 10.0])), 0)
+    # print(m)
+
+    a = np.array([1]*10).astype(np.int8)
+    b = np.array([0.01, 0.01, 0.01, 0, 0, 0, 0.67, 0.5,0.5, 0.3]).astype(np.float)
+
+    print(average_precision_score(y_true=a, y_score=b))
+  
+
+
+
     

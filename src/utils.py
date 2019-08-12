@@ -101,8 +101,7 @@ def ap_per_query(best_matches, query_gt_dict):
             preds.append(0)
     
     num_gt = len(query_gt_dict['positive'])
-    y_true = [1]*num_gt
-    return average_precision_score(y_true=y_true, y_score=preds[:num_gt])
+    return ap_at_k_per_query(preds, k=num_gt)
 
 
 def plot_history(train_hist, val_hist, y_label, filename, labels=["train", "validation"]):
