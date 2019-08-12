@@ -11,6 +11,16 @@ from sklearn.metrics import average_precision_score
 
 
 def draw_label(img_path, color_code):
+    """
+    Function that draws a rectangle around an image given the rgb color code
+
+    Args:
+        img_path    : path of the image
+        color_code  : color code of the bounding box
+    
+    Returns:
+        numpy array with the rectangle drawn
+    """
     img = Image.open(img_path)
     np_ar = np.array(img)
     rects = [(0, 0, np_ar.shape[1], np_ar.shape[0])]
@@ -20,6 +30,16 @@ def draw_label(img_path, color_code):
 
 
 def ap_at_k_per_query(np_query_labels, k=5):
+    """
+    Given the binary prediction of labels, this function returns the average precision at specified k
+    
+    Args:
+        np_query_labels : numpy array/ python list with binary values
+        k   : cutoff point to find the average precision
+    
+    Returns:
+        Average Precision at k
+    """
     ap = 0.0
     running_positives = 0
     for idx, i in enumerate(np_query_labels[:k]):
@@ -31,6 +51,19 @@ def ap_at_k_per_query(np_query_labels, k=5):
 
 
 def get_preds_and_visualize(best_matches, query_gt_dict, img_dir, top_k_to_plot):
+    """
+    Given the best matching file names and ground truth dictionary for query, this function
+    returns the binary prediction as well as plots the top_k image results
+
+    Args:
+        best_matches    : list of best file matches. i.e.: ['all_souls_0000051.jpg', .....]
+        query_gt_dict   : Dictionary indicating the postive and negative ground truth for query
+        img_dir         : Image directory that has all the target images stored
+        top_k_to_plot   : number of top results to plot
+    
+    Returns:
+        binary predictions
+    """
     # Create python list to store preds
     preds = []
 
@@ -68,6 +101,10 @@ def get_preds_and_visualize(best_matches, query_gt_dict, img_dir, top_k_to_plot)
 
 
 def get_preds(best_matches, query_gt_dict):
+    """
+    See gets_preds_and_visualize(**args). 
+    It is the same function without any plots
+    """
    
     # Create python list to store preds
     preds = []
@@ -86,7 +123,16 @@ def get_preds(best_matches, query_gt_dict):
 
 
 def ap_per_query(best_matches, query_gt_dict):
+    """
+    Given best matches and query ground truth, calculate the average precision
 
+    Args:
+        best_matches    : list of best matching files
+        query_gt_dict   : dictionary indicating the positive and negative examples for the query
+
+    Returns:
+        Average Precision for the query
+    """
     # Create python list to store preds
     preds = []
 
@@ -132,27 +178,35 @@ def plot_history(train_hist, val_hist, y_label, filename, labels=["train", "vali
 
 
 def center_crop_numpy(img, cropx, cropy):
+    """
+    Givenn an image numpy array, perform a center crop.
+
+    Args:
+        img     : numpy image array
+        cropx   : width of crop
+        cropy   : height of crop
+    
+    Returns:
+        cropped numpy image array
+    """
     y,x = img.shape[:-1]
     startx = x//2-(cropx//2)
     starty = y//2-(cropy//2)
     return img[starty:starty+cropy, startx:startx+cropx, :]
 
 
-# def perform_pca_on_database():
-#     # Creat image database
-#     QUERY_IMAGES_FTS = [os.path.join("./fts/", file) for file in sorted(os.listdir("./fts/"))]
-#     QUERY_NAMES = sorted(os.listdir("./fts/"))
-    
-#     pca = PCA(n_components=2)
-#     for file in tqdm(QUERY_IMAGES_FTS):
-#         file_fts = np.squeeze(np.load(file)).reshape(2048, -1)
-#         pca.fit(file_fts)
-#         x = pca.transform(file_fts)
-#         target_file_name = os.path.join("./fts_reduced/", file.split("/")[-1])
-#         np.save(target_file_name, x.flatten())
-
-
 def perform_pca_on_single_vector(ft_np_vector, n_components=2, reshape_dim=2048):
+    """
+    Given a feature vector, perform dimension reduction using PCA.
+
+    Args:
+        ft_np_vector    : numpy feature vector
+        n_components    : number of principal components
+        reshape_dim     : height of reshaped matrix
+    
+    Returns
+        PCA performed vector
+    """
     pca = PCA(n_components=n_components, whiten=True)
     file_fts = ft_np_vector.reshape(reshape_dim, -1)
     pca.fit(file_fts)
@@ -160,7 +214,24 @@ def perform_pca_on_single_vector(ft_np_vector, n_components=2, reshape_dim=2048)
     return x.flatten()
 
 
-def template_matching(target_img_path, compare_img_path_list, img_dir):
+def template_matching(target_img_path, compare_img_path_list, img_dir, top_k=500):
+    """
+    Given a target image path and list of image paths, get the top k structurally similar image paths
+
+    Args:
+        target_img_path         : path of reference image
+        compare_img_path_list   : paths of images to be compared as a list
+        img_dir                 : Image directory
+        top_k                   : Number of top similar image paths to return
+    
+    Returns:
+        top_k structurally similar image paths
+
+    Eg run:
+        > files = [os.path.join("./data/oxbuild/images", file) for file in os.listdir("./data/oxbuild/images/")]
+        > print(files)
+        > template_matching("./data/oxbuild/images/all_souls_000051.jpg", files, "./data/oxbuild/images/", 500)
+    """
     
     ssim = []
     for other_img_path in tqdm(compare_img_path_list):
@@ -183,11 +254,6 @@ def template_matching(target_img_path, compare_img_path_list, img_dir):
         score = compare_ssim(gray_target, gray_other, full=False)
         ssim.append(score)
 
-    indexes = (-np.array(ssim)).argsort()[:500]
+    indexes = (-np.array(ssim)).argsort()[:top_k]
     final_results = [compare_img_path_list[index] for index in indexes]
     return final_results
-
-
-# files = [os.path.join("./data/oxbuild/images", file) for file in os.listdir("./data/oxbuild/images/")]
-# print(files)
-# template_matching("./data/oxbuild/images/all_souls_000051.jpg", files)

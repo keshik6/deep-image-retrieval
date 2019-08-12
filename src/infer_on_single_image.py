@@ -102,10 +102,8 @@ def validate(labels_dir,
     for i in query_image_paths:
         ap = inference_on_single_labelled_image_pca(query_img_file=i, labels_dir=labels_dir, img_dir=img_dir, img_fts_dir=img_fts_dir, weights_file=weights_file, plot=False)
         aps.append(ap)
-        print(ap)
 
     
-    print(aps, np.array(aps).mean())
     return np.array(aps).mean()
 
 
@@ -170,16 +168,14 @@ def inference_on_single_labelled_image_pca(query_img_file,
         preds = get_preds(best_matches, query_gt_dict)
     
     # Get average precision
-    #ap = ap_at_k_per_query(preds, top_k)
     ap = ap_per_query(best_matches, query_gt_dict)
     
-    print(ap)
     return ap
 
 
 if __name__ == '__main__':
-    validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", img_fts_dir="./fts_pca/oxbuild/", weights_file="./weights/oxbuild-exp-3.pth")
-    #inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-1.pth")
+    # validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", img_fts_dir="./fts_pca/oxbuild/", weights_file="./weights/oxbuild-exp-3.pth")
+    # inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-1.pth")
     # inference_on_single_labelled_image_pca(query_img_file="./data/oxbuild/images/all_souls_000051.jpg", 
     #                                         labels_dir="./data/oxbuild/gt_files/", 
     #                                         img_dir="./data/oxbuild/images/",
