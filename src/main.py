@@ -91,8 +91,6 @@ def main(data_dir, results_dir, weights_dir,
     # Create embedding network
     embedding_model = create_embedding_net()
     model = TripletNet(embedding_model)
-    print("> Loading weight files")
-    model.load_state_dict(torch.load("./weights/oxbuild-exp-2.pth"))
     model.to(device)
 
     # Create optimizer and scheduler

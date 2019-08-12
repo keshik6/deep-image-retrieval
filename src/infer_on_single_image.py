@@ -60,7 +60,6 @@ def inference_on_single_labelled_image_pca(query_img_file,
                 top_k=1000,
                 plot=True,
                 ):
-    
     """
     Function that returns the average precision for a given query image and also plots the top 20 results
 
@@ -133,9 +132,8 @@ def inference_on_single_labelled_image_pca(query_img_file,
 
 
 # if __name__ == '__main__':
-    # validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", img_fts_dir="./fts_pca/oxbuild/", weights_file="./weights/oxbuild-exp-3.pth")
-    # inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-1.pth")
-    # inference_on_single_labelled_image_pca(query_img_file="./data/oxbuild/images/all_souls_000051.jpg", 
+    # measure_performance(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/images/", img_fts_dir="./fts_pca/oxbuild/", weights_file="./weights/oxbuild-exp-3.pth")
+    # inference_on_single_labelled_image_pca(query_img_file="./data/oxbuild/images/all_souls_000013.jpg", 
     #                                         labels_dir="./data/oxbuild/gt_files/", 
     #                                         img_dir="./data/oxbuild/images/",
     #                                         img_fts_dir="./fts_pca/oxbuild/",

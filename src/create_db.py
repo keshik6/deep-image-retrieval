@@ -112,4 +112,4 @@ def create_embeddings_db_pca(model_weights_path, img_dir, fts_dir):
 
 
 # if __name__ == '__main__':
-#     create_embeddings_db_pca("./weights/oxbuild-exp-3.pth")
+#     create_embeddings_db_pca("./weights/oxbuild-exp-3.pth", img_dir="./data/oxbuild/images/", fts_dir="./fts_pca/oxbuild/")
