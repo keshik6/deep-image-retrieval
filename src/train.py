@@ -16,18 +16,19 @@ def train_model(model, device, optimizer, scheduler,
     Train a deep neural network model
     
     Args:
-        model: pytorch model object
-        device: cuda or cpu
-        optimizer: pytorch optimizer object
-        scheduler: learning rate scheduler object that wraps the optimizer
-        train_dataloader: training  images dataloader
-        valid_dataloader: validation images dataloader
-        save_dir: Location to save model weights, plots and log_file
-        epochs: number of training epochs
-        log_file: text file instance to record training and validation history
+        model   : pytorch model object
+        device  : cuda or cpu
+        optimizer   : pytorch optimizer object
+        scheduler   : learning rate scheduler object that wraps the optimizer
+        train_dataloader    : training  images dataloader
+        valid_dataloader    : validation images dataloader
+        epochs  : number of training epochs
+        update_batch    : after how many batches should gradient update be performed 
+        save_dir    : Location to save model weights, plots and log_file
+        log_file    : text file instance to record training and validation history
         
     Returns:
-        Training history and Validation history (loss and average precision)
+        Training history and Validation history (loss)
     """
     tr_loss = []
     valid_loss = []
@@ -97,7 +98,6 @@ def train_model(model, device, optimizer, scheduler,
                 # Calculate statistics and log
                 num_samples = float(len(train_loader.dataset))
                 tr_loss_ = running_loss.item()/num_samples
-                # tr_map_, valid_map_ = inference_on_set(model=model, top_k=50, device=device)
                 tr_loss.append(tr_loss_)
                 print('> train_loss: {:.4f}\t'.format(tr_loss_))
                 log_file.write('> train_loss: {:.4f}\t'.format(tr_loss_))

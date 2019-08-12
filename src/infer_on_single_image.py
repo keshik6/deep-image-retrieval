@@ -15,7 +15,6 @@ from sklearn.metrics import average_precision_score
 from torch.utils.data import DataLoader
 from inference import get_query_embedding
 
-
 def inference_on_single_labelled_image(query_img_file, 
                 labels_dir="./data/oxbuild/gt_files/", 
                 img_dir="./data/oxbuild/images/",
