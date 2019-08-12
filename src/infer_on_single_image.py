@@ -10,7 +10,7 @@ from dataset import QueryExtractor, EmbeddingDataset
 from torchvision import transforms
 import torchvision.models as models
 import torch
-from utils import draw_label, ap_at_k_per_query, get_preds, get_preds_and_visualize, perform_pca_on_single_vector
+from utils import draw_label, ap_at_k_per_query, get_preds, get_preds_and_visualize, perform_pca_on_single_vector, ap_per_query
 from sklearn.metrics import average_precision_score
 from torch.utils.data import DataLoader
 from inference import get_query_embedding
@@ -76,9 +76,11 @@ def inference_on_single_labelled_image(query_img_file,
         preds = get_preds(best_matches, query_gt_dict)
     
     # Get average precision
-    ap = ap_at_k_per_query(preds, top_k)
+    # ap = ap_at_k_per_query(preds, top_k)
     
+    ap = ap_per_query(best_matches, query_gt_dict)
     print(ap)
+
     return ap
 
 
@@ -108,7 +110,7 @@ def validate(labels_dir="./data/oxbuild/gt_files/", img_dir="./data/oxbuild/imag
 def inference_on_single_labelled_image_pca(query_img_file, 
                 labels_dir="./data/oxbuild/gt_files/", 
                 img_dir="./data/oxbuild/images/",
-                img_fts_dir="./fts_reduced/",
+                img_fts_dir="./fts_pca/oxbuild/",
                 top_k=50,
                 plot=True,
                 weights_file=None,
@@ -166,7 +168,8 @@ def inference_on_single_labelled_image_pca(query_img_file,
         preds = get_preds(best_matches, query_gt_dict)
     
     # Get average precision
-    ap = ap_at_k_per_query(preds, top_k)
+    #ap = ap_at_k_per_query(preds, top_k)
+    ap = ap_per_query(best_matches, query_gt_dict)
     
     print(ap)
     return ap
@@ -175,4 +178,4 @@ def inference_on_single_labelled_image_pca(query_img_file,
 if __name__ == '__main__':
     #validate(subset="train")
     #inference_on_single_labelled_image(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-1.pth")
-    #inference_on_single_labelled_image_pca(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-1.pth")
+    inference_on_single_labelled_image_pca(query_img_file="./data/oxbuild/images/all_souls_000026.jpg", weights_file="./weights/oxbuild-exp-2.pth")

@@ -29,8 +29,8 @@ def get_query_embedding(model,
     # Create transforms
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    transforms_test = transforms.Compose([transforms.Resize(256),
-                                        transforms.FiveCrop(224),                               
+    transforms_test = transforms.Compose([transforms.Resize(460),
+                                        transforms.FiveCrop(448),                               
                                         transforms.Lambda(lambda crops: torch.stack([transforms.ToTensor()(crop) for crop in crops])),
                                         transforms.Lambda(lambda crops: torch.stack([transforms.Normalize(mean = mean, std = std)(crop) for crop in crops])),
                                         ])

@@ -11,6 +11,7 @@ import torchvision.models as models
 from torch.utils.data import DataLoader
 from utils import perform_pca_on_single_vector
 
+
 def create_embeddings_db(model_weights_path, img_dir="./data/oxbuild/images/", fts_dir="./fts/"):
     
     # Create cuda parameters

@@ -7,6 +7,8 @@ from skimage.measure import compare_ssim
 import cv2
 from tqdm import tqdm
 from sklearn.decomposition import PCA
+from sklearn.metrics import average_precision_score
+
 
 def draw_label(img_path, color_code):
     img = Image.open(img_path)
@@ -81,6 +83,26 @@ def get_preds(best_matches, query_gt_dict):
             preds.append(0)
         
     return preds
+
+
+def ap_per_query(best_matches, query_gt_dict):
+
+    # Create python list to store preds
+    preds = []
+
+    # Iterate through the best matches and find predictions
+    for i, pic in enumerate(best_matches): 
+        img_name = "{}".format(pic.split("/")[-1])
+        if img_name in query_gt_dict['positive']:
+            preds.append(1)
+        elif img_name in query_gt_dict['negative']:
+            preds.append(0)
+        else:
+            preds.append(0)
+    
+    num_gt = len(query_gt_dict['positive'])
+    y_true = [1]*num_gt
+    return average_precision_score(y_true=y_true, y_score=preds[:num_gt])
 
 
 def plot_history(train_hist, val_hist, y_label, filename, labels=["train", "validation"]):

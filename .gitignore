@@ -109,6 +109,7 @@ data/
 # features
 fts/
 fts_reduced/
+fts_pca/
 
 # results
 /results
