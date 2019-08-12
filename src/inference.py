@@ -22,7 +22,7 @@ def get_query_embedding(model, device, query_img_file):
     model.eval()
 
     # Read image
-    image = Image.open(query_img_file)
+    image = Image.open(query_img_file).convert("RGB")
 
     # Create transforms
     mean = [0.485, 0.456, 0.406]
