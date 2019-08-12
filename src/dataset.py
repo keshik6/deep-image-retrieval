@@ -9,7 +9,16 @@ import math
 from utils import template_matching
 
 class QueryExtractor():
+    """
+    This class extracts all the queries and triplets for both datasets
+    
+    Eg run:
+        # Define directories
+        > labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
 
+        # Create Query extractor object
+        > q = QueryExtractor(labels_dir, image_dir, subset="inference", query_suffix="oxc1_")
+    """
     def __init__(self, labels_dir, image_dir, subset, query_suffix="oxc1_", identifiers=['good', 'ok', 'junk', 'bad']):
         """
         Initialize the Query Extractor class
@@ -153,6 +162,9 @@ class QueryExtractor():
         
     
     def _create_bad_image_files(self, query_txt_file, target_img_path, compare_img_list):
+        """
+        This function uses structural similarity to create hard negative examples for a given query.
+        """
         # Create a list of dummy files since same landscape queries have the same ground truth
         bad_file_name = os.path.join(self.labels_dir, query_txt_file.replace('query', "bad"))
 
@@ -162,8 +174,6 @@ class QueryExtractor():
             file_name = bad_file_name.replace("1", str(i))
             target_bad_files.append(file_name)
         
-        print(target_bad_files)
-
         neg_list = template_matching(target_img_path, compare_img_list, self.image_dir)
         
         for bad_file in target_bad_files:
@@ -175,6 +185,9 @@ class QueryExtractor():
 
     
     def _get_blacklist(self):
+        """
+        Paris 6k dataset has blacklisted images that should be filtered.
+        """
         return ["paris_louvre_000136.jpg",
         "paris_louvre_000146.jpg",
         "paris_moulinrouge_000422.jpg",
@@ -198,11 +211,17 @@ class QueryExtractor():
 
 
     def get_triplets(self):
+        """
+        Return the triplets
+        """
         shuffle(self.triplet_pairs)
         return self.triplet_pairs
 
     
     def reset(self):
+        """
+        Regenerate triplets using different combinations. Do note that the number of triplets is cubic in anchor examples.
+        """
         print("> Resetting dataset")
         self._generate_triplets()
         shuffle(self.triplet_pairs)
@@ -212,7 +231,21 @@ class QueryExtractor():
 
 
 class VggImageRetrievalDataset(Dataset):
+    """
+    Dataset class generic for both Oxford and Paris datasets.
 
+    Eg run:
+        # Define directories
+        > labels_dir, image_dir = "./data/oxbuild/gt_files/", "./data/oxbuild/images/"
+
+        # Create Query extractor object
+        > q = QueryExtractor(labels_dir, image_dir, subset="inference", query_suffix="oxc1_")
+        
+        # Instantiate dataset class and retrieve the first triplet
+        > ox = VggImageRetrievalDataset(labels_dir, image_dir, q, transforms=transforms_test)
+        > a, p, n = ox.__getitem__(0)
+
+    """
     def __init__(self, labels_dir, image_dir, triplet_pair_generator, transforms=None):
         self.labels_dir = labels_dir
         self.image_dir = image_dir
@@ -258,6 +291,9 @@ class VggImageRetrievalDataset(Dataset):
 
     
 class EmbeddingDataset(Dataset):
+    """
+    Evaluation dataset used to obtain the embeddings
+    """
     def __init__(self, image_dir, query_img_list, transforms):
         if transforms == None:
             raise
