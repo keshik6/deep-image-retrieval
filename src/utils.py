@@ -101,6 +101,7 @@ def ap_per_query(best_matches, query_gt_dict):
             preds.append(0)
     
     num_gt = len(query_gt_dict['positive'])
+
     return ap_at_k_per_query(preds, k=num_gt)
 
 

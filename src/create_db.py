@@ -65,7 +65,7 @@ def create_embeddings_db(model_weights_path, img_dir="./data/oxbuild/images/", f
         
 
 
-def create_embeddings_db_pca(model_weights_path, img_dir="./data/paris/images/", fts_dir="./fts_pca/paris/"):
+def create_embeddings_db_pca(model_weights_path, img_dir="./data/oxbuild/images/", fts_dir="./fts_pca/oxbuild/"):
     
     # Create cuda parameters
     use_cuda = torch.cuda.is_available()
@@ -151,4 +151,4 @@ def create_embeddings_db_pca(model_weights_path, img_dir="./data/paris/images/",
 
 
 if __name__ == '__main__':
-    create_embeddings_db_pca("./weights/paris-exp-1.pth")
+    create_embeddings_db_pca("./weights/oxbuild-exp-3.pth")
