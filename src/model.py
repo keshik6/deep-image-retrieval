@@ -3,7 +3,12 @@ import torch.nn.functional as F
 import torchvision.models as models
 
 class TripletNet(nn.Module):
+    """
+    Class implementing the Triple Net
 
+    Attributes:
+        embedding_net: torchvision model instance. i.e. torchvision.models.resnet50(pretrained=True)
+    """
     def __init__(self, embedding_net):
         super(TripletNet, self).__init__()
         self.embedding_net = embedding_net
@@ -28,8 +33,11 @@ class TripletNet(nn.Module):
 
 class TripletLoss(nn.Module):
     """
-    Triplet loss
-    Takes embeddings of an anchor sample, a positive sample and a negative sample
+    Class implementing Triplet loss
+    It takes embeddings of an anchor sample, a positive sample and a negative sample and returns the triplet loss
+
+    Attributes:
+        margin: margin value used to seperate positive and negative samples
     """
 
     def __init__(self, margin=2):
@@ -53,6 +61,9 @@ class TripletLoss(nn.Module):
 
 
 class Identity(nn.Module):
+    """
+    Class implementing identity module
+    """
     def __init__(self):
         super().__init__()
 
@@ -61,6 +72,12 @@ class Identity(nn.Module):
 
 
 def create_embedding_net():
+    """
+    Function to create embedding net
+
+    Returns:
+        embedding net instance
+    """
     # This is a resnet50 base model
     resnet_model = models.resnet50(pretrained=True)
 
