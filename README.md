@@ -30,3 +30,10 @@ Given a dataset D<sub>n</sub> = {
 where q<sub>x</sub> indicates the x<sup>th</sup> query image and p<sub>xk</sub> indicates the k<sup>th</sup> positive example for the query q<sub>x</sub>. Do note that the number of positive examples for each query are not the same.
 
 Given this dataset, our goal is to learn an embedding from these images to a compact latent space where cosine similarity between two learned embeddings correspond to a ranking measure for image retrieval task.
+
+# Methodology and Loss function
+We leverage on a siamese architecture that combines three input streams with a triplet loss. We make use of triplet loss because this has shown to be more effective for ranking problems. 
+
+To formally describe, triplet loss is a loss function where a baseline (anchor, in our case the query image) is compared to a positive (as per annotation) image and a negative image. The triplet loss minimizes the distance from the anchor image to the positive image and maximizes the distance from the anchor image to the negative image over all the triplets in the dataset.  It is formally described below.
+
+![alt text](https://raw.githubusercontent.com/keshik6/deep_image_retrieval/master/readme_pics/triplet_loss.png)
