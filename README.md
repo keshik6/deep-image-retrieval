@@ -17,3 +17,14 @@ We used an 80/ 20 ratio for splitting positive examples for every query to creat
 |---------|---------|----------|--------------------|----------------------|
 | Oxford  | 5042    | 55       | 3373               | 831                  |
 | Paris   | 6412    | 55       | 13230              | 3421                 |
+
+# Problem Description
+As mentioned in the introduction, the problem can be formulated as follows. 
+Given a dataset D<sub>n</sub> = {
+(q<sub>1</sub>, p<sub>11</sub>, ,p<sub>12</sub> ,p<sub>13</sub> , … , p<sub>1m</sub>),
+(q<sub>2</sub>, p<sub>21</sub>, ,p<sub>22</sub> ,p<sub>23</sub> , … , p<sub>2k</sub>),
+.....,
+(q<sub>n</sub>, p<sub>n1</sub>, ,p<sub>n2</sub> ,p<sub>n3</sub> , … , p<sub>nr</sub>),
+}
+
+where q<sub>x</sub> indicates the x<sup>th</sup> query image and p<sub>xk</sub> indicates the k<sup>th</sup> positive example for the query q<sub>x</sub>. Do note that the number of positive examples for each query are not the same.
