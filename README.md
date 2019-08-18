@@ -5,7 +5,7 @@
 - [Data](#data)
 - [Problem Description](#problem-description)
 - [Loss function](#loss-function)
-- [How to choose triplets?](#how-to-choose-triplets-)
+- [How to choose triplets?](#how-to-choose-triplets)
 - [Methodology](#methodology)
 - [Deep Learning Architecture](#deep-learning-architecture)
 - [Metrics](#metrics)
