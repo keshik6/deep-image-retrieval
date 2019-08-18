@@ -38,7 +38,7 @@ To formally describe, triplet loss is a loss function where a baseline (anchor, 
 
 ![alt text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_loss.png)
 
-Where f<sub>ia</sub>, f<sub>ip</sub> and f<sub>in</sub> corresponds to the i<sup>th</sup> anchor, positive and negative embeddings respectively. We use a margin $\alpha$ to separate the embeddings.
+Where  f<sub>i</sub><sup>a</sup>, f<sub>i</sub><sup>p</sup> and f<sub>i</sub><sup>n</sup> corresponds to the i<sup>th</sup> anchor, positive and negative embeddings respectively. We use a margin $\alpha$ to separate the embeddings.
 
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_learning.png)
 
