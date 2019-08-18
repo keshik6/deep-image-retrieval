@@ -105,8 +105,12 @@ Hyperparameter search was an interesting challenge we faced. Initially, our mode
 We also had to visualize training results constantly to see how our model performs visually. 
 
 ## Results
-### Oxford Dataset
+### Training History
+#### Oxford Dataset
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/oxford_loss.png)
 
-### Paris Dataset
+#### Paris Dataset
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/paris_loss.png)
+
+### Performance 
+Mean average precision and AP@k for trained models are given below. We also included the performance of MAC (Maximum Activation of Convolutions) method and Net-VLAD for comparison.
