@@ -56,7 +56,7 @@ As you can clearly see, a large portion of images chosen to be negative examples
 
 We thought about both the data and the problem of choosing triplets quite carefully and decided to choose the negative images that have the highest structural similarity against the anchor as our negative examples when creating triplets.
 
-**What is structural similarity?**
+**What is structural similarity?**  
 Structural similarity measures the perceptual difference between two images. It considers image degradation as perceived change in structural information. The SSIM formula is a weighted sum based three comparison measurements between the 2 images, namely, luminance, contrast and structure. See appendix section for references.
 
 ## Methodology
