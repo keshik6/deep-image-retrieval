@@ -119,6 +119,11 @@ Mean average precision and AP@k for trained models are given below. We also incl
 
 As you can see our models perform reasonably given the amount of computational power we had. Generally the best performing models go for very large sizes of images in the network and also design triplets using more sophisticated mechanisms such as unsupervised/ weakly supervised triplet selection.
 
+## Flask Application for Inference 
+We built a flask application to allow users to perform visual search both on the query images as well as any new image. The HTML page is rendered on the server and displayed in a browser. A user can select the target image to search for similar images which will redirect to the inference results page that contains our model prediction. If any query images from the training set is selected, we also display the ground truth results.
+
+The flask application is very intuitive to use. Some snips from the application are shown below.
+
 ## Google drive link
 All the data, pre-trained weights and pca features can be found here
 https://drive.google.com/open?id=1Fy8md62TW3fmnkrv0o34ix3DjwdDK3NC
