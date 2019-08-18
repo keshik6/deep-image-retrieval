@@ -114,3 +114,5 @@ We also had to visualize training results constantly to see how our model perfor
 
 ### Performance 
 Mean average precision and AP@k for trained models are given below. We also included the performance of MAC (Maximum Activation of Convolutions) method and Net-VLAD for comparison.
+
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/performance.jpg)
