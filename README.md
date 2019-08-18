@@ -106,6 +106,7 @@ We also had to visualize training results constantly to see how our model perfor
 
 ## Results
 ### Oxford Dataset
-
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/oxford_loss.png)
 
 ### Paris Dataset
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/paris_loss.png)
