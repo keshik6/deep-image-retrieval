@@ -104,4 +104,8 @@ Hyperparameter search was an interesting challenge we faced. Initially, our mode
 
 We also had to visualize training results constantly to see how our model performs visually. 
 
+## Results
+### Oxford Dataset
 
+
+### Paris Dataset
