@@ -116,3 +116,5 @@ We also had to visualize training results constantly to see how our model perfor
 Mean average precision and AP@k for trained models are given below. We also included the performance of MAC (Maximum Activation of Convolutions) method and Net-VLAD for comparison.
 
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/performance.JPG)
+
+As you can see our models perform reasonably given the amount of computational power we had. Generally the best performing models go for very large sizes of images in the network and also design triplets using more sophisticated mechanisms such as unsupervised/ weakly supervised triplet selection.
