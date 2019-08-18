@@ -123,6 +123,8 @@ As you can see our models perform reasonably given the amount of computational p
 We built a flask application to allow users to perform visual search both on the query images as well as any new image. The HTML page is rendered on the server and displayed in a browser. A user can select the target image to search for similar images which will redirect to the inference results page that contains our model prediction. If any query images from the training set is selected, we also display the ground truth results.
 
 The flask application is very intuitive to use. Some snips from the application are shown below.
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/flask1.png)
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/flask2.png)
 
 ## Google drive link
 All the data, pre-trained weights and pca features can be found here
