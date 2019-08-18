@@ -51,3 +51,20 @@ Consider the negative examples randomly sampled for the following anchor image.
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/all_souls_000051.jpg)
 
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/neg_ex1.jpg)
+
+As you can clearly see, a large portion of images chosen to be negative examples are too easy, meaning that the algorithm doesn’t need to make any effort to learn to discriminate between the positive and negative examples.
+
+We thought about both the data and the problem of choosing triplets quite carefully and decided to choose the negative images that have the highest structural similarity against the anchor as our negative examples when creating triplets.
+
+**What is structural similarity?**
+Structural similarity measures the perceptual difference between two images. It considers image degradation as perceived change in structural information. The SSIM formula is a weighted sum based three comparison measurements between the 2 images, namely, luminance, contrast and structure. See appendix section for references.
+
+## Methodology
+Given an anchor image, we consider 500x500 center crop of anchor image against all the other non-positive images in the dataset, center cropped to 500x500 and measure the structural similarity. We select the top 500 images with the largest structural similarity as our negative example pool. 
+
+Given this methodology, consider the hard-negatives chosen for the same query image.
+
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/neg_ssim_ex1.jpg)
+
+As you can see, these examples are hard-negative examples that can allow our algorithm to learn better embeddings. In terms of implementation, we processed the query images to select top 500 negative images based on structural similarity offline and these are annotated as ‘bad’ files.
+
