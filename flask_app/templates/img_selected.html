@@ -1,0 +1,202 @@
+<!doctype html>
+<title>AI Project 2019</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+ 
+<!-- If IE use the latest rendering engine -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+ 
+<!-- Set the page to the width of the device and set the zoon level -->
+<meta name="viewport" content="width = device-width, initial-scale = 1">
+<title>Bootstrap Tutorial</title>
+
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" type = "text/css" href="{{url_for('static', filename='style.css')}}">
+
+</head>
+<body>
+<div class="container-fluid">
+
+<!-- page-header-->
+<div class="page-header" style="text-align:center">
+<h1>Deep Image Retrieval</h1>
+</div>
+
+{% if filename=="" %}
+    <h1>Please select an image</h1>
+    <a href="/" class="btn btn-info" role="button">Go Back</a>
+    
+{% else %}
+    <div class="container-fluid" style="text-align:center">
+        <h3>Original Image</h3>
+        <img src={{ filename }} height ="200" width=auto/>
+        {% if valid==1 %}
+        <img src={{url_for('static', filename='legends.png')}} height ="200" width="400" align="right" class='side-image'/>
+        {% endif %}
+        <!-- <h5>{{filename}}</h5>-->
+        <h3>Visually Similar Images</h3>
+    </div>
+    
+    <!-- Similar images-->
+    
+
+    <div class="tab-content">
+        
+        <!-- Page 1-->
+        <div id="page1" class="tab-pane fade in active">
+            <div class="container-fluid">
+            {% for i in range(0,12) %}
+                {% if gt[i]==1 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#c7ffbe;">
+                        <img src={{ evaluated[i] }} />
+                        <!-- <h5>{{filename}}</h5>-->
+                    </a>
+                    </div>
+                {% elif gt[i]==0 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#fff;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% else %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#ffd2d2;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+        <!-- Page 2-->
+        <div id="page2" class="tab-pane fade">
+            <div class="container-fluid">
+            {% for i in range(12,24) %}
+                {% if gt[i]==1 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#c7ffbe;">
+                        <img src={{ evaluated[i] }} />
+                        <!-- <h5>{{filename}}</h5>-->
+                    </a>
+                    </div>
+                {% elif gt[i]==0 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#fff;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% else %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#ffd2d2;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+        <!-- Page 3-->
+        <div id="page3" class="tab-pane fade">
+            <div class="container-fluid">
+            {% for i in range(24,36) %}
+                {% if gt[i]==1 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#c7ffbe;">
+                        <img src={{ evaluated[i] }} />
+                        <!-- <h5>{{filename}}</h5>-->
+                    </a>
+                    </div>
+                {% elif gt[i]==0 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#fff;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% else %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#ffd2d2;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+        <!-- Page 4-->
+        <div id="page4" class="tab-pane fade">
+            <div class="container-fluid">
+            {% for i in range(36,48) %}
+                {% if gt[i]==1 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#c7ffbe;">
+                        <img src={{ evaluated[i] }} />
+                        <!-- <h5>{{filename}}</h5>-->
+                    </a>
+                    </div>
+                {% elif gt[i]==0 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#fff;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% else %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#ffd2d2;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+        <!-- Page 5-->
+        <div id="page5" class="tab-pane fade">
+            <div class="container-fluid">
+            {% for i in range(48,60) %}
+                {% if gt[i]==1 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#c7ffbe;">
+                        <img src={{ evaluated[i] }} />
+                        <!-- <h5>{{filename}}</h5>-->
+                    </a>
+                    </div>
+                {% elif gt[i]==0 %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#fff;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% else %}
+                    <div class="col-sm-2">
+                    <a href="/ImgSelected2/{{ i }}" class="thumbnail" style="border-color:#ffd2d2;">
+                        <img src={{ evaluated[i] }} />
+                    </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Toggle between Pages-->
+    <ul class="nav nav-pills">
+      <li class="active"><a data-toggle="tab" href="#page1">1</a></li>
+      <li><a data-toggle="tab" href="#page2">2</a></li>
+      <li><a data-toggle="tab" href="#page3">3</a></li>
+      <li><a data-toggle="tab" href="#page4">4</a></li>
+      <li><a data-toggle="tab" href="#page5">5</a></li>
+    </ul>
+
+
+
+    <p></p>
+    <a href="/" class="btn btn-info" role="button">Go Back</a>
+    <p></p>
+    
+{% endif %}
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</body>
+</html>

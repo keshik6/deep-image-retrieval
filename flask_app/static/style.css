@@ -1,0 +1,112 @@
+h1 {
+    color: black;
+}
+
+.thumbnail img {
+    height:200px;
+    width:auto;
+}
+
+@media (min-width: 1200px) {
+    .container{
+        max-width: 1200px;
+    }
+}
+
+.jumbotron {
+  position:relative;
+  overflow:hidden;
+}
+
+.jumbotron .container {
+  position:relative;
+  z-index:2;
+  
+  background:rgba(0,0,0,0);
+  padding:2rem;
+  border:1px solid rgba(0,0,0,0);
+  border-radius:3px;
+}
+
+.jumbotron-background {
+  object-fit:cover;
+  font-family: 'object-fit: cover;';
+  position:absolute;
+  top:0;
+  z-index:1;
+  width:100%;
+  height:100%;
+  opacity:0.5;
+}
+
+img.blur {
+    -webkit-filter: blur(4px);
+    filter: blur(4px);
+  filter:progid:DXImageTransform.Microsoft.Blur(PixelRadius='4');
+
+}
+
+.center-pills { display: inline-block; }
+
+.side-image {
+  float: right;
+  margin-left: -400px;
+}
+
+.thumbnail {
+    border-color: #fff;
+    border-width: 3px;
+}
+
+.img-upload-btn { 
+    position: relative; 
+    overflow: hidden; 
+    padding-top: 95%;
+} 
+
+.img-upload-btn input[type=file] { 
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    min-width: 100%; 
+    min-height: 100%; 
+    font-size: 100px; 
+    text-align: right; 
+    filter: alpha(opacity=0); 
+    opacity: 0; 
+    outline: none; 
+    background: white; 
+    cursor: inherit; 
+    display: block; 
+} 
+
+.img-upload-btn i { 
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    top: 50%;
+    left: 50%;
+    margin-top: -8px;
+    margin-left: -8px;
+}
+
+.btn-radio {
+    position: relative; 
+    overflow: hidden; 
+}
+
+.btn-radio input[type=radio] { 
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    min-width: 100%; 
+    min-height: 100%; 
+    font-size: 100px; 
+    text-align: right; 
+    filter: alpha(opacity=0); 
+    opacity: 0; 
+    outline: none; 
+    background: white; 
+    cursor: inherit; 
+    display: block; 
+}

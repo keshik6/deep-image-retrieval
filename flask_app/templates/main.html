@@ -1,0 +1,97 @@
+<!doctype html>
+<title>AI Project 2019</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+ 
+<!-- If IE use the latest rendering engine -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+ 
+<!-- Set the page to the width of the device and set the zoon level -->
+<meta name="viewport" content="width = device-width, initial-scale = 1">
+<title>Bootstrap Tutorial</title>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" type = "text/css" href="{{url_for('static', filename='style.css')}}">
+ 
+</head>
+<body>
+
+<!-- page-header-->
+<div class="page-header">
+
+<div class="jumbotron jumbotron-fluid bg-dark">
+  
+  <div class="jumbotron-background">
+    <img src="/static/data/oxbuild/images/new_001062.jpg" class="blur " height="350" width ="1600">
+  </div>
+
+  <div class="container text-white">
+
+    <h1 class="display-4" style="text-align:center">Deep Image Retrieval</h1>
+    <p class="lead" style="text-align:center">The goal of this project is deep image retrieval, that is learning an embedding (or mapping) from images to a compact latent space in which cosine similarity between two learned embeddings correspond to a ranking measure for image retrieval task.</p>
+
+  </div>
+  <!-- /.container -->
+  
+ 
+</div>
+</div>
+<div class="container-fluid">
+<!-- Main button toggles: Validate and Upload-->
+<ul class="nav nav-pills">
+  <li class="active"><a data-toggle="tab" href="#validation">Validate</a></li>
+  <li><a data-toggle="tab" href="#upload">Upload</a></li>
+</ul>
+<div class="tab-content">
+  
+  <!-- Validate Toggle-->
+  <div id="validation" class="tab-pane fade in active">
+    <h4>Pick an image to validate</h4>
+	<ul class="nav nav-pills">
+	  <li class="active"><a data-toggle="tab" href="#groupA">Oxford</a></li>
+	  <li><a data-toggle="tab" href="#groupB">Paris</a></li>
+	</ul>
+	<div class="tab-content">
+
+      <!-- Group A Images-->
+	  <div id="groupA" class="tab-pane fade in active">
+		<div class="container-fluid">
+		{% for i in range(0,12) %}
+			<div class="col-sm-2">
+				<a href="ImgSelected/oxbuild/{{ i }}" class="thumbnail">
+					<img src={{ valid_img_oxford[i] }} />
+				</a>
+			</div>
+		{% endfor %}
+		</div>
+	  </div>
+
+      <!-- Group B Images-->
+	  <div id="groupB" class="tab-pane fade">
+		<div class="container-fluid">
+		{% for i in range(0,12) %}
+			<div class="col-sm-2">
+				<a href="ImgSelected/paris/{{ i }}" class="thumbnail">
+					<img src={{ valid_img_paris[i] }} />
+				</a>
+			</div>
+		{% endfor %}
+		</div>
+	  </div>
+	</div>
+  </div>
+
+  <!-- Upload Toggle-->
+  <div id="upload" class="tab-pane fade">
+    <h4>You can upload your own image here:</h4>
+    <form method=POST enctype=multipart/form-data action="{{ url_for('evaluateNew') }}">
+        <input type=file name=photo>
+        <input type="submit">
+  </div>
+</div>
+</div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</body>
+</html>
