@@ -21,9 +21,9 @@
     + [Performance](#performance)
   * [Flask Application for Inference](#flask-application-for-inference)
   * [Google drive link](#google-drive-link)
-  * [How to reproduce the code?](#how-to-reproduce-the-code-)
-    + [Pytorch source code (Included in /src)](#pytorch-source-code--included-in--src-)
-    + [Flask App (Included in /flask_app)](#flask-app--included-in--flask-app-)
+  * [How to reproduce the code?](#how-to-reproduce-the-code)
+    + [Pytorch source code (Included in /src)](#pytorch-source-code--included-in--src)
+    + [Flask App (Included in /flask_app)](#flask-app--included-in--flask-app)
 
 
 ## Introduction
