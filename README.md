@@ -1,5 +1,31 @@
 # Deep Image Retrieval
 
+## Table of Contents
+- [Deep Image Retrieval](#deep-image-retrieval)
+  * [Introduction](#introduction)
+  * [Data](#data)
+  * [Problem Description](#problem-description)
+  * [Loss function](#loss-function)
+  * [How to choose triplets?](#how-to-choose-triplets-)
+  * [Methodology](#methodology)
+  * [Deep Learning Architecture](#deep-learning-architecture)
+  * [Metrics](#metrics)
+  * [Hyper-parameters](#hyper-parameters)
+  * [Data Augmentations](#data-augmentations)
+  * [Dimension Reduction and deployment](#dimension-reduction-and-deployment)
+  * [Challenges](#challenges)
+  * [Results](#results)
+    + [Training History](#training-history)
+      - [Oxford Dataset](#oxford-dataset)
+      - [Paris Dataset](#paris-dataset)
+    + [Performance](#performance)
+  * [Flask Application for Inference](#flask-application-for-inference)
+  * [Google drive link](#google-drive-link)
+  * [How to reproduce the code?](#how-to-reproduce-the-code-)
+    + [Pytorch source code (Included in /src)](#pytorch-source-code--included-in--src-)
+    + [Flask App (Included in /flask_app)](#flask-app--included-in--flask-app-)
+
+
 ## Introduction
 The goal of this project is deep image retrieval, that is learning an embedding (or mapping) from images to a compact latent space in which cosine similarity between two learned embeddings correspond to a ranking measure for image retrieval task.
 
