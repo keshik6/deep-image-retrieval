@@ -72,3 +72,18 @@ As you can see, these examples are hard-negative examples that can allow our alg
 Deep neural networks have proven to be good feature extractors in the recent time since they carry out representation learning as well without any hand-engineered features. Hence, we decided to use a Resnet50 backbone as our feature extractor network where we removed the Global Average pooling layer and the fully connected layer. An example of the architecture is shown below.
 
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_network.png)
+
+## Metrics
+We use mean average precision over all the queries as our metric. We used the easy evaluation metric where we treated all labelled images to be positive and sampled negative images using structural similarity to be negative.
+
+## Hyper-parameters
+|              | #Oxford                                               | #Paris                                                |
+|--------------|-------------------------------------------------------|-------------------------------------------------------|
+| Image size   | (3, 448, 448)                                         | (3, 448, 448)                                         |
+| Batch size   | 64 (Parameters updated for every 64 samples)          | 64 (Parameters updated for every 64 samples)          |
+| Initial lr   | 2.5e-6                                                | 5e-6                                                  |
+| Optimizer    | Adam                                                  | Adam                                                  |
+| Epoch        | 35                                                    | 25                                                    |
+| Weight decay | 1e-5                                                  | 1e-5                                                  |
+| lr scheduler | Cosine Annealing learning rate scheduler with Tmax=10 | Cosine Annealing learning rate scheduler with Tmax=10 |
+
