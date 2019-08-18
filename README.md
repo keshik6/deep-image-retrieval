@@ -41,3 +41,13 @@ To formally describe, triplet loss is a loss function where a baseline (anchor, 
 Where f<sub>ia</sub>, f<sub>ip</sub> and f<sub>in</sub> corresponds to the i<sup>th</sup> anchor, positive and negative embeddings respectively. We use a margin $\alpha$ to separate the embeddings.
 
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_learning.png)
+
+Do note that training is quite expensive due to the fact that optimization is directly performed on the triplet space, where the number of possible triplets for training is cubic in the number of training examples.
+
+# How to choose triplets?
+A major problem with training triplet optimization problems lies in how the triplets are being chosen. For this specific problem, since we are not given any negative examples for the query, many attempts tend to choose negative examples (that excludes anchor and positive examples) randomly from the dataset and form triplets to be trained on. While this is a reasonable method, we need to show semi-hard examples to the algorithm so that it learns some quantifiable information through parametrization.
+Consider the negative examples randomly sampled for the following anchor image.
+
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/all_souls_000051.jpg)
+
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/neg_ex1.jpg)
