@@ -77,7 +77,7 @@ Deep neural networks have proven to be good feature extractors in the recent tim
 We use mean average precision over all the queries as our metric. We used the easy evaluation metric where we treated all labelled images to be positive and sampled negative images using structural similarity to be negative.
 
 ## Hyper-parameters
-|              | #Oxford                                               | #Paris                                                |
+|              | Oxford                                                | Paris                                                 |
 |--------------|-------------------------------------------------------|-------------------------------------------------------|
 | Image size   | (3, 448, 448)                                         | (3, 448, 448)                                         |
 | Batch size   | 64 (Parameters updated for every 64 samples)          | 64 (Parameters updated for every 64 samples)          |
@@ -86,4 +86,22 @@ We use mean average precision over all the queries as our metric. We used the ea
 | Epoch        | 35                                                    | 25                                                    |
 | Weight decay | 1e-5                                                  | 1e-5                                                  |
 | lr scheduler | Cosine Annealing learning rate scheduler with Tmax=10 | Cosine Annealing learning rate scheduler with Tmax=10 |
+
+## Data Augmentations 
+We utilized standard augmentations including horizontal flipping, rotations, brightness adjustment, zooming, grayscaling and random resized cropping for training.
+
+## Dimension Reduction and deployment
+The embedding that we train is very high dimensional vector. So it doesn’t allow scalability when the size of your database increases. So we used Principal Component Analysis (PCA) to reduce the dimensions of the vector to 4096-dimensional vector with whitening so that our model can perform faster in real-time deployment.
+
+Hence at test time, we run the image through our model, get the embedding, reduce using PCA to 4096-dimensional vector and use cosine similarity to obtain the most similar images from the database. 
+
+## Challenges
+Hyperparameter search was an interesting challenge we faced. Initially, our model faced overfitting problems and the model also got stuck in suboptimal local minima. We were able to resolve these issues by,
+1. Using smaller learning rate so that we do not disrupt imagenet weights drastically.
+2. Using learning rate scheduler rather than using static learning rates.
+3. Choosing good set of image augmentations to add a small amount of noise during training to make the model robust.
+4. We had to experiment with different margin rates for Triplet loss and margin of 2 seemed to work very well.
+
+We also had to visualize training results constantly to see how our model performs visually. 
+
 
