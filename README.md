@@ -15,15 +15,15 @@
   * [Dimension Reduction and deployment](#dimension-reduction-and-deployment)
   * [Challenges](#challenges)
   * [Results](#results)
-    + [Training History](#training-history)
+    * [Training History](#training-history)
       - [Oxford Dataset](#oxford-dataset)
       - [Paris Dataset](#paris-dataset)
-    + [Performance](#performance)
+    * [Performance](#performance)
   * [Flask Application for Inference](#flask-application-for-inference)
   * [Google drive link](#google-drive-link)
   * [How to reproduce the code?](#how-to-reproduce-the-code)
-    + [Pytorch source code (Included in /src)](#pytorch-source-code-included-in--src)
-    + [Flask App (Included in /flask_app)](#flask-app--included-in-flask-app)
+    * [Pytorch source code (Included in /src)](#pytorch-source-code--included-in--src-)
+    * [Flask App (Included in /flask_app)](#flask-app--included-in--flask-app-)
 
 
 ## Introduction
