@@ -37,3 +37,7 @@ We leverage on a siamese architecture that combines three input streams with a t
 To formally describe, triplet loss is a loss function where a baseline (anchor, in our case the query image) is compared to a positive (as per annotation) image and a negative image. The triplet loss minimizes the distance from the anchor image to the positive image and maximizes the distance from the anchor image to the negative image over all the triplets in the dataset.  It is formally described below.
 
 ![alt text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_loss.png)
+
+Where f<sub>ia</sub>, f<sub>ip</sub> and f<sub>in</sub> corresponds to the i<sup>th</sup> anchor, positive and negative embeddings respectively. We use a margin $\alpha$ to separate the embeddings.
+
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_learning.png)
