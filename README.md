@@ -3,7 +3,7 @@
 ## Introduction
 The goal of this project is deep image retrieval, that is learning an embedding (or mapping) from images to a compact latent space in which cosine similarity between two learned embeddings correspond to a ranking measure for image retrieval task.
 
-# Data
+## Data
 
 We used two popular Image retrieval datasets published by the Oxford Visual Geometry Group for this project,
 1.  Oxford Buildings dataset
@@ -18,7 +18,7 @@ We used an 80/ 20 ratio for splitting positive examples for every query to creat
 | Oxford  | 5042    | 55       | 3373               | 831                  |
 | Paris   | 6412    | 55       | 13230              | 3421                 |
 
-# Problem Description
+## Problem Description
 As mentioned in the introduction, the problem can be formulated as follows. 
 Given a dataset D<sub>n</sub> = {
 (q<sub>1</sub>, p<sub>11</sub>, ,p<sub>12</sub> ,p<sub>13</sub> , … , p<sub>1m</sub>),
@@ -31,7 +31,7 @@ where q<sub>x</sub> indicates the x<sup>th</sup> query image and p<sub>xk</sub> 
 
 Given this dataset, our goal is to learn an embedding from these images to a compact latent space where cosine similarity between two learned embeddings correspond to a ranking measure for image retrieval task.
 
-# Methodology and Loss function
+## Loss function
 We leverage on a siamese architecture that combines three input streams with a triplet loss. We make use of triplet loss because this has shown to be more effective for ranking problems. 
 
 To formally describe, triplet loss is a loss function where a baseline (anchor, in our case the query image) is compared to a positive (as per annotation) image and a negative image. The triplet loss minimizes the distance from the anchor image to the positive image and maximizes the distance from the anchor image to the negative image over all the triplets in the dataset.  It is formally described below.
@@ -44,7 +44,7 @@ Where f<sub>ia</sub>, f<sub>ip</sub> and f<sub>in</sub> corresponds to the i<sup
 
 Do note that training is quite expensive due to the fact that optimization is directly performed on the triplet space, where the number of possible triplets for training is cubic in the number of training examples.
 
-# How to choose triplets?
+## How to choose triplets?
 A major problem with training triplet optimization problems lies in how the triplets are being chosen. For this specific problem, since we are not given any negative examples for the query, many attempts tend to choose negative examples (that excludes anchor and positive examples) randomly from the dataset and form triplets to be trained on. While this is a reasonable method, we need to show semi-hard examples to the algorithm so that it learns some quantifiable information through parametrization.
 Consider the negative examples randomly sampled for the following anchor image.
 
@@ -68,3 +68,5 @@ Given this methodology, consider the hard-negatives chosen for the same query im
 
 As you can see, these examples are hard-negative examples that can allow our algorithm to learn better embeddings. In terms of implementation, we processed the query images to select top 500 negative images based on structural similarity offline and these are annotated as ‘bad’ files.
 
+## Deep Learning Architecture
+Deep neural networks have proven to be good feature extractors in the recent time since they carry out representation learning as well without any hand-engineered features. Hence, we decided to use a Resnet50 backbone as our feature extractor network where we removed the Global Average pooling layer and the fully connected layer. An example of the architecture is shown below.
