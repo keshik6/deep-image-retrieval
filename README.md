@@ -144,3 +144,13 @@ https://drive.google.com/open?id=1Fy8md62TW3fmnkrv0o34ix3DjwdDK3NC
 5. To run inference on query image files, use inference_on_single_image.py. The function is clearly documented.
 
 
+### Flask App (Included in /flask_app)
+1. Install dependencies : pip install -r requirements.txt
+2. Download data.zip, fts_pca.zip and weights.zip from google drive link provided above
+3. Extract the downloaded folders (data, fts_pca and weights) and place them in static/
+4. Deploy the app : python deploy.py
+5. Open a web browser and go to http://localhost:5000
+
+The inference results are stored in static/temp folder with a unique identifier. 
+Users have to manually clear the static/temp folder if it is taking up a lot of space.
+
