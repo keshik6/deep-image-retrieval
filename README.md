@@ -38,7 +38,7 @@ To formally describe, triplet loss is a loss function where a baseline (anchor, 
 
 ![alt text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_loss.png)
 
-Where f<sub>ia</sub>, f<sub>ip</sub> and f<sub>in</sub> corresponds to the i<sup>th</sup> anchor, positive and negative embeddings respectively. We use a margin $\alpha$ to separate the embeddings.
+Where  f<sub>i</sub><sup>a</sup>, f<sub>i</sub><sup>p</sup> and f<sub>i</sub><sup>n</sup> corresponds to the i<sup>th</sup> anchor, positive and negative embeddings respectively. We use a margin $\alpha$ to separate the embeddings.
 
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_learning.png)
 
@@ -131,7 +131,7 @@ All the data, pre-trained weights and pca features can be found here
 https://drive.google.com/open?id=1Fy8md62TW3fmnkrv0o34ix3DjwdDK3NC
 
 ## How to reproduce the code?
-### Pytorch source code
+### Pytorch source code (Included in /src)
 1. Install dependencies: pip install -r requirements.txt
 2. Directory structure
 * /data: Download the data from google drive link provided. You can choose to download the data from VGG website but, we have already created the negative ground truth files using structural similarity and have included in google drive. Otherwise the script will automatically start to create the negative examples which might take about 2 hrs. So using google drive to download data is recommended.
@@ -143,4 +143,15 @@ https://drive.google.com/open?id=1Fy8md62TW3fmnkrv0o34ix3DjwdDK3NC
 4. To create the pca embeddings using your own model, use create_db.py. The function is clearly documented with an examples as well.
 5. To run inference on query image files, use inference_on_single_image.py. The function is clearly documented.
 
+
+### Flask App (Included in /flask_app)
+**The flask application is intended to be run independently. But to avoid confusions I have included the source code for the flask app in the same repository. So do not get confused.**
+1. Install dependencies : pip install -r flask_app/requirements.txt
+2. Download data.zip, fts_pca.zip and weights.zip from google drive link provided above
+3. Extract the downloaded folders (data, fts_pca and weights) and place them in flask_app/static/
+4. Deploy the app : python flask_app/deploy.py
+5. Open a web browser and go to http://localhost:5000
+
+The inference results are stored in flask_app/static/temp folder with a unique identifier. 
+Users have to manually clear the flask_app/static/temp folder if it is taking up a lot of space.
 
