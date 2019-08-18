@@ -70,3 +70,5 @@ As you can see, these examples are hard-negative examples that can allow our alg
 
 ## Deep Learning Architecture
 Deep neural networks have proven to be good feature extractors in the recent time since they carry out representation learning as well without any hand-engineered features. Hence, we decided to use a Resnet50 backbone as our feature extractor network where we removed the Global Average pooling layer and the fully connected layer. An example of the architecture is shown below.
+
+![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/triplet_network.png)
