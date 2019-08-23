@@ -26,7 +26,7 @@
 
 
 ## Introduction
-The goal of this project is deep image retrieval, that is learning an embedding (or mapping) from images to a compact latent space in which cosine similarity between two learned embeddings correspond to a ranking measure for image retrieval task. **This repository contains a simple starter implementation for deep image retrieval. Advanced features like query expansion or attention are not implemented here. **
+The goal of this project is deep image retrieval, that is learning an embedding (or mapping) from images to a compact latent space in which cosine similarity between two learned embeddings correspond to a ranking measure for image retrieval task. **This repository contains a simple starter implementation for deep image retrieval. Advanced features like query expansion or attention are not implemented here.**
 
 ![alt_text](https://github.com/keshik6/deep-image-retrieval/blob/master/readme_pics/demo.gif)
 
